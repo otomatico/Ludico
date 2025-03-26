@@ -1,14 +1,11 @@
 
 #ifndef _GAME_H_
-
+#include "etc/env"
 #include <string.h>
 #include "lib/Utils.hpp"
 // #define LINUX       // For compile from inux
 #include "Fruit.cpp"
 #include "Snake.cpp"
-
-#define SCREEN_WIDTH 80
-#define SCREEN_HEIGHT 24
 
 #define stepAnimation(step) ++animateCount > step
 

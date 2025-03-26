@@ -2,12 +2,6 @@
 #include "Game.hpp"
 #endif
 
-#define BOARD_WIDTH 60
-#define BOARD_HEIGHT 10
-
-#define BOARD_MARGIN_X 5
-#define BOARD_MARGIN_Y 5
-
 class Game : public GameBase
 {
 
@@ -23,18 +17,22 @@ public:
     void Draw()
     {
         // en lugar de clear(), esto evita parpadeos
-        gotoxy(1, 1);
+        //gotoxy(1, 1);
+         cls();
         drawBackground();
         switch (this->stateGame)
         {
-        case OPEN:
+        case MENU:
             drawOpenning();
             break;
+        case OPENING:
+
+            break;
         default:
-            drawGameScore(this);
-            drawTail(&this->snake.tail, &this->buffer);
-            drawFruit(&this->fruit, &this->buffer);
-            drawBoard(&this->buffer);
+            drawGameScore();
+            drawTail();
+            drawFruit();
+            drawBoard();
             if (this->stateGame == OVER)
             {
                 drawGameOver();
@@ -50,77 +48,64 @@ public:
 
     void Logic()
     {
-        int change = 0;
-        switch (this.stateGame)
+        char key = press();
+        switch (stateGame)
         {
-        case OPEN:
-
-            if (stick->event() && stick->key())
-            {
-                this.level = 1;
-                this.score = 0;
-                initPlayer(&(this->snake));
-                initFruit(&(this->fruit), this->level);
-                this->stateGame = GAME;
-                change = 1;
+        case OPENING:
+            // level = 1;
+            // score = 0;
+            // drawable = true;
+            Initialize();
+            stateGame = MENU;
+            break;
+        case MENU:
+            if(press()){
+                stateGame = START;
+                level = 1;
+                score = 0;
+                drawable = true;
             }
             break;
-        case GAME:
-            char key = '\0';
-            change = 1;
-            clearGFX(&this->buffer);
-            if (stick->event())
+        case START:
+            drawable = true;
+            if (key == KEY_ESC)
             {
-                key = stick->key();
-            }
-            if (key == KEY_PAUSE)
-            {
-                this->stateGame = PAUSE;
+                stateGame = PAUSE;
             }
             else
             {
-                int hit = collision(&this->snake, &this->fruit);
-                if (hit < 0)
+                player->Move(key);
+                Point position = player->GetPosition();
+                if (player->Collide(&position))
                 {
-                    this->stateGame = OVER;
+                    stateGame = OVER;
+                }
+                if (enemy->Collide(&position))
+                {
+                    enemy->Move();
                 }
                 else
                 {
-                    moveGame(this, hit, key);
+                    player->Step();
                 }
             }
             break;
         case PAUSE:
 
-            if (stick->event())
+            if (key == KEY_ESC)
             {
-                switch (stick->key())
-                {
-                case KEY_ESC:
-                    this->stateGame = EXIT;
-                    break;
-                case KEY_ENTER:
-                    this->stateGame = OPEN;
-                    break;
-                case KEY_PAUSE:
-                    this->stateGame = GAME;
-                    break;
-                }
-                change = 1;
+                stateGame = START;
+                drawable = true;
             }
             break;
         case OVER:
-            if (stick->event())
+            if (key != KEY_EMPTY)
             {
-                destroyTail(&(this->snake.tail));
-                destroyStack(&(this->fruit));
-                this->stateGame = OPEN;
-                stick->key();
-                change = 1;
+                stateGame = OPENING;
+                drawable = true;
             }
             break;
         }
-        return change;
     }
 
 private:
@@ -134,92 +119,84 @@ private:
         player = new Snake(BOARD_WIDTH / 2, BOARD_HEIGHT / 2);
         enemy = new Fruit();
         stateGame = OPENING;
+        level = 1;
         score = 0;
         animateCount = 0;
+        drawable = true;
+        FPS = 2;
     }
     void drawBackground()
     {
         colorGraphic(YELLOW, LIGHTGREY);
         for (int y = 1; y < SCREEN_HEIGHT; y++)
         {
-            for (int x = 1; x < SCREEN_WIDTH; x++)
-            {
-                DrawString(x, y, "░");
-            }
+            DrawBarHorizontal(1, y, SCREEN_WIDTH, CHAR_SOLID_50);
         }
     }
     void drawOpenning()
     {
         colorGraphic(GREEN, RED);
-        DrawString(BOARD_MARGIN_X, BOARD_MARGIN_Y + 0, "╔══════════════════════════════╗");
-        DrawString(BOARD_MARGIN_X, BOARD_MARGIN_Y + 1, "║   CSnake, Snake make in C    ║");
-        DrawString(BOARD_MARGIN_X, BOARD_MARGIN_Y + 2, "║                              ║");
-        DrawString(BOARD_MARGIN_X, BOARD_MARGIN_Y + 3, "║                              ║");
-        DrawString(BOARD_MARGIN_X, BOARD_MARGIN_Y + 4, "║       Press any key          ║");
-        DrawString(BOARD_MARGIN_X, BOARD_MARGIN_Y + 5, "╚══════════════════════════════╝");
+        DrawWindow(BOARD_MARGIN_X, BOARD_MARGIN_Y, 32, 6);
+        DrawString(BOARD_MARGIN_X + 1, BOARD_MARGIN_Y + 1, "         Snake en C++          ");
+        DrawString(BOARD_MARGIN_X + 1, BOARD_MARGIN_Y + 2, "         by Otomatico          ");
+        DrawString(BOARD_MARGIN_X + 1, BOARD_MARGIN_Y + 3, "                               ");
+        DrawString(BOARD_MARGIN_X + 1, BOARD_MARGIN_Y + 4, "        Press any key          ");
+        resetColor();
     }
 
     void drawBoard()
     {
-        int row;
-        textcolor(WHITE);
+        colorGraphic(WHITE, LIGHTGREY);
         DrawWindow(BOARD_MARGIN_X - 1, BOARD_MARGIN_Y - 1, BOARD_WIDTH, BOARD_HEIGHT);
+        for (int row = 0; row < BOARD_HEIGHT; row++)
+        {
+            DrawBarHorizontal(BOARD_MARGIN_X, BOARD_MARGIN_Y + row, BOARD_WIDTH, CHAR_SOLID_50);
+        }
     }
 
     void drawTail()
     {
-        Point2D board = {BOARD_MARGIN_X, BOARD_MARGIN_Y};
-        Node *pointer = this->first;
-        Point2D head;
         textcolor(GREEN);
-        while (pointer != NULL)
+        for (Point tail : player->GetPositions())
         {
-            head = look(pointer);
-            putPixelGFX(buffer, head.x, head.y, GREEN);
-            pointer = pointer->next;
+            DrawChar(tail.x, tail.y, CHAR_SOLID);
         }
+        textcolor(LIGHTGREEN);
+        Point head = player->GetPosition();
+        DrawChar(head.x, head.y, CHAR_SOLID);
     }
 
-    void drawFruit(Stack *this, gfx *buffer)
+    void drawFruit()
     {
-        Point2D board = {BOARD_MARGIN_X, BOARD_MARGIN_Y};
-        Node *pointer = this->first;
-        Point2D head;
-        textcolor(RED);
-        while (pointer != NULL)
-        {
-            head = look(pointer);
-            putPixelGFX(buffer, head.x, head.y, RED);
-            pointer = pointer->next;
-        }
+        Point head = enemy->GetPosition();
+        textcolor(LIGHTRED);
+        DrawChar(head.x, head.y, CHAR_SOLID);
     }
 
     void drawPause()
     {
         resetColor();
-        DrawString(BOARD_MARGIN_X, BOARD_MARGIN_Y + 0, "╔══════════════════════════════╗");
-        DrawString(BOARD_MARGIN_X, BOARD_MARGIN_Y + 1, "║          Game Pause          ║");
-        DrawString(BOARD_MARGIN_X, BOARD_MARGIN_Y + 2, "║                              ║");
-        DrawString(BOARD_MARGIN_X, BOARD_MARGIN_Y + 3, "║      Press [ESC]  Exit       ║");
-        DrawString(BOARD_MARGIN_X, BOARD_MARGIN_Y + 4, "║    Press [Intro] Reboot      ║");
-        DrawString(BOARD_MARGIN_X, BOARD_MARGIN_Y + 5, "║    Press [Space] continue    ║");
-        DrawString(BOARD_MARGIN_X, BOARD_MARGIN_Y + 6, "╚══════════════════════════════╝");
+        DrawWindow(BOARD_MARGIN_X, BOARD_MARGIN_Y, 32, 6);
+        DrawString(BOARD_MARGIN_X + 1, BOARD_MARGIN_Y + 1, "           Game Pause          ");
+        DrawString(BOARD_MARGIN_X + 1, BOARD_MARGIN_Y + 2, "                               ");
+        DrawString(BOARD_MARGIN_X + 1, BOARD_MARGIN_Y + 3, "       Press [ESC]  Exit       ");
+        DrawString(BOARD_MARGIN_X + 1, BOARD_MARGIN_Y + 4, "     Press [Intro] Reboot      ");
+        DrawString(BOARD_MARGIN_X + 1, BOARD_MARGIN_Y + 5, "     Press [Space] continue    ");
     }
 
     void drawGameOver()
     {
         colorGraphic(RED, DARKGREY);
-        DrawString(BOARD_MARGIN_X, BOARD_MARGIN_Y + 0, "╔══════════════════════════════╗");
-        DrawString(BOARD_MARGIN_X, BOARD_MARGIN_Y + 1, "║          Game Over           ║");
-        DrawString(BOARD_MARGIN_X, BOARD_MARGIN_Y + 2, "║                              ║");
-        DrawString(BOARD_MARGIN_X, BOARD_MARGIN_Y + 3, "║      Press any continue      ║");
-        DrawString(BOARD_MARGIN_X, BOARD_MARGIN_Y + 4, "╚══════════════════════════════╝");
+        DrawWindow(BOARD_MARGIN_X, BOARD_MARGIN_Y, 32, 4);
+        DrawString(BOARD_MARGIN_X+1, BOARD_MARGIN_Y + 1, "          Game Over           ");
+        DrawString(BOARD_MARGIN_X+1, BOARD_MARGIN_Y + 2, "                              ");
+        DrawString(BOARD_MARGIN_X+1, BOARD_MARGIN_Y + 3, "      Press any continue      ");
+
     }
 
     void drawGameScore()
     {
         colorGraphic(DARKGREY, WHITE);
-        // ▀ ▄ █ ▌ ▐ └┘│╜╖║ ┌
         DrawString(1, 1, " █▀▀ █▌ █  █▀█  █ ▄▀ █▀▀   ┌─────────────────────────────╖  ");
         DrawString(1, 2, " ▀▀█ █▀▄█ ▐█▄█▌ ██▄  █▀    │ SCORE: 0000      LEVEL: 000 ║  "); //, this->score, this->level);
         DrawString(1, 3, " ▀▀▀ ▀  ▀ ▀▀ ▀▀ ▀  ▀ ▀▀▀   └─────────────────────────────╜  ");

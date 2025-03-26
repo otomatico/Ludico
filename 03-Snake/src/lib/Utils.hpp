@@ -11,6 +11,16 @@
 // Hack -> repoduzir um pito/pitido
 #define bell() printf("%c", 0x7)
 
+#define CHAR_EMPTY 0x20
+#define CHAR_SOLID 0xdb
+#define CHAR_LOWER 0xdc
+#define CHAR_UPPER 0xdf
+
+#define CHAR_SOLID_25 0xb0
+#define CHAR_SOLID_50 0xb1
+#define CHAR_SOLID_75 0xb2
+
+
 void DrawBarVertical(short x, short y, short size, char c);
 void DrawBarHorizontal(short x, short y, short size, char c);
 void DrawWindow(short x, short y, short width, short height);

@@ -1,4 +1,5 @@
 #include "lib/Utils.hpp"
+#include "etc/env"
 
 class Fruit
 {
@@ -26,9 +27,9 @@ protected:
 
     private:
     Point generatePosition(){
-        return (Point) {
-             rand() % (BOARD_WIDTH - 1),
-             rand() % (BOARD_HEIGHT - 1)
-        };
+        Point res;
+        res.x = (short) rand() % (BOARD_WIDTH - 1);
+        res.y = (short)rand() % (BOARD_HEIGHT - 1);
+        return res;
     }
 };

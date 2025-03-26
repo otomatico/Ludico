@@ -51,17 +51,18 @@ int _kbhit()
 #define KEY_ENTER 10
 #define KEY_A 97
 #define KEY_B 115
+#define KEY_EMPTY 0
 
 char press()
 {
-    char key = 0;
+    char key = KEY_EMPTY;
     if (_kbhit())
     {
         key = _getch();
         switch (key)
         {
         default:
-            key = 0;
+            key = KEY_EMPTY;
             break;
         case KEY_UP:
         case KEY_DOWN:

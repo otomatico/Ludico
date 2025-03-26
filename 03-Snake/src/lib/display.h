@@ -1,5 +1,6 @@
 #ifndef _DISPLAY_H_
 #define _DISPLAY_H_
+#include <stdio.h>
 /*************************Como desenhar com cores*****************************/
 /* Atributos */
 #define RESETATTR 0
@@ -31,7 +32,7 @@
 
 #define hidecursor() printf("\e[?25l")
 #define showcursor() printf("\e[?25h")
-#define clear() printf("\e[1;1H\e[2J")
+#define cls()      printf("\e[1;1H\e[2J")
 //#define clear() system("cls")
 
 #define gotoxy(x, y) printf("\e[%d;%dH", (int)y, (int)x)
