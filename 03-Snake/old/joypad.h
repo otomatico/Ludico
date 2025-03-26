@@ -1,6 +1,7 @@
 #ifndef _JOYPAD_H
 #define _JOYPAD_H
-#include "conio.h"
+//#include "conio.h"
+#include "keyboard.h"
 
 typedef struct _joypad
 {
@@ -10,8 +11,8 @@ typedef struct _joypad
 
 void initJoy(Joypad *this)
 {
-	this->event = kbhit;
-	this->key = btn;
+	this->event = _kbhit;
+	this->key = press;
 }
 
 #define KEY_UP 38
