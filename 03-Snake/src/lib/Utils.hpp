@@ -1,6 +1,10 @@
 
 #ifndef _UTILS_H_
 #define _UTILS_H_
+#include <iostream>   // printf
+#include "display.h"  // gotoxy, textcolor, textbackground
+#include "keyboard.h" //_kbhit, _getch, press
+
 // Hack -> Coloca o CURSOR na posição (X,Y) do Monitor e escrever uma letra ou cadena
 #define DrawChar(x, y, c) printf("\e[%d;%dH%c", y, x, c)
 #define DrawString(x, y, s) printf("\e[%d;%dH%s", y, x, s)
@@ -11,9 +15,29 @@
 // Hack -> repoduzir um pito/pitido
 #define bell() printf("%c", 0x7)
 
+#define CHAR_EMPTY 0x20
+#define CHAR_SOLID 0xdb
+#define CHAR_LOWER 0xdc
+#define CHAR_UPPER 0xdf
+
+#define CHAR_SOLID_25 0xb0
+#define CHAR_SOLID_50 0xb1
+#define CHAR_SOLID_75 0xb2
+
+typedef enum
+{
+    OPENING,
+    MENU,
+    START,
+    PAUSE,
+    OVER,
+    ENDING,
+    EXIT
+} StateGame;
+/*
 void DrawBarVertical(short x, short y, short size, char c);
 void DrawBarHorizontal(short x, short y, short size, char c);
 void DrawWindow(short x, short y, short width, short height);
+*/
 
-#include "Utils.cpp"  // gotoxy, textcolor, textbackground
 #endif
