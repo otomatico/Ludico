@@ -1,35 +1,24 @@
-#include "lib/Utils.hpp"
+#include "lib/IElement.hpp"
+#include <stdlib.h>   // srand, rand
 #include "etc/env"
 
-class Fruit
+class Fruit : public IElement
 {
 
 public:
     Fruit()
     {
-        position = generatePosition();
+        Initialize();
     }
-    Point GetPosition()
-    {
-        return position;
-    }
-    bool Collide(Point *value)
-    {
-        return value->x == position.x && value->y == position.y;
-    }
+
     void Move()
     {
-        position = generatePosition();
+        Initialize();
     }
-
-protected:
-    Point position;
-
-    private:
-    Point generatePosition(){
-        Point res;
-        res.x = (short) rand() % (BOARD_WIDTH - 1);
-        res.y = (short)rand() % (BOARD_HEIGHT - 1);
-        return res;
+private:
+    void Initialize()
+    {
+        position.x = (rand() % BOARD_WIDTH);
+        position.y = (rand() % BOARD_HEIGHT);
     }
 };

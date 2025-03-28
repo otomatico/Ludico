@@ -2,11 +2,11 @@
  * Version 1.2 => Traduce la idea de forma imperativa a una orientada por Objeto
  */
 
-#include "Game.hpp"
+#include "Game.cpp"
 
 int main()
 {
-    Game snake;
-    return snake.Run();
+    IGame *snakeGame = new Game();
+    return snakeGame->Run();
 }
 

@@ -1,25 +1,34 @@
-#include "lib/Utils.hpp"
+#include "lib/IElement.hpp"
+#include "lib/keyboard.h"
+#include "etc/env"
 #include <iostream>
 #include <list>
-#include "etc/env"
 using namespace std;
-class Snake : public BasePlayer
+class Snake : public IElement
 {
 
 public:
-    Snake(int x = 1, int y = 1)
+    Snake()
     {
-        resetPosition(x, y);
+        tail = {};
+    }
+
+    ~Snake()
+    {
+        while (!tail.empty())
+        {
+            tail.pop_back();
+        }
     }
 
     void resetPosition(int x, int y)
     {
-        while (tail.size() > 0)
+        while (!tail.empty())
         {
             tail.pop_back();
         }
-        tail.push_back((Point){(short)(x - 1), (short)y});
         tail.push_back((Point){(short)(x - 2), (short)y});
+        tail.push_back((Point){(short)(x - 1), (short)y});
         position.x = (short)x;
         position.y = (short)y;
         lastKey = KEY_RIGHT;
@@ -29,45 +38,31 @@ public:
     {
         return tail;
     }
+
     bool Collide(Point *value)
     {
-        bool crash = false;
-        Point aux;
-        for (int i = 0; i < tail.size() && !crash; i++)
+        bool crash;
+        for (Point slice : tail)
         {
-            aux = tail.front();
-            crash = value->x == aux.x && value->y == aux.y;
-            tail.pop_front();
-            tail.push_back(aux);
+            crash = (value->x == slice.x && value->y == slice.y);
+            if (crash)
+            {
+                return true;
+            }
         }
-        return crash || value->x == position.x && value->y == position.y;
+        return false;
     }
-    void Move(unsigned char key)
+
+    void Move(int key)
     {
-        switch (key)
+        if (key == KEY_UP || key == KEY_DOWN || key == KEY_RIGHT || key == KEY_LEFT)
         {
-        case KEY_UP:
-        case KEY_DOWN:
-        case KEY_RIGHT:
-        case KEY_LEFT:
             lastKey = key;
-            break;
-        default:
-            break;
         }
-        Move_Snake();
-    }
-    void Step()
-    {
-        tail.pop_front();
+        Move();
     }
 
-protected:
-    list<Point> tail;
-    unsigned char lastKey;
-
-private:
-    void Move_Snake()
+    void Move()
     {
         tail.push_back(position);
         switch (lastKey)
@@ -88,4 +83,13 @@ private:
             break;
         }
     }
+
+    void Step()
+    {
+        tail.pop_front();
+    }
+
+protected:
+    list<Point> tail;
+    int lastKey;
 };

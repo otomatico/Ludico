@@ -1,8 +1,15 @@
-#ifndef _GAME_H_
-#include "Game.hpp"
-#endif
+#include "IGame.hpp"
+/**Estos #include estam aqui porque es proprio de la clase */
+#include "etc/env"
+#include "lib/Utils.cpp"
+#include <string.h>
+#include "Fruit.cpp"
+#include "Snake.cpp"
+#include "lib/CanvasMonocrome.cpp"
 
-class Game : public GameBase
+#define stepAnimation(step) ++animateCount > step
+
+class Game : public IGame
 {
 
 public:
@@ -12,119 +19,112 @@ public:
         stateGame = OPENING;
         animateCount = 0;
         drawable = true;
+        canvas = new CanvasMonocrome(BOARD_WIDTH, BOARD_HEIGHT);
+        player = new Snake();
+        enemy = new Fruit();
         hidecursor();
+    }
+    ~Game()
+    {
+        showcursor();
     }
     void Draw()
     {
-        // en lugar de clear(), esto evita parpadeos
-        //gotoxy(1, 1);
-         cls();
-        drawBackground();
-        switch (this->stateGame)
-        {
-        case MENU:
-            drawOpenning();
-            break;
-        case OPENING:
+        static bool drawablebkg = false;
+        gotoxy(1, 1);
 
-            break;
-        default:
-            drawGameScore();
-            drawTail();
-            drawFruit();
+        if (stateGame == OPENING)
+        {
+            drawBackground();
+            return;
+        }
+
+        if (stateGame == MENU)
+        {
+            drawBackground();
+            drawOpenning();
+            return;
+        }
+        if (stateGame == START || stateGame == OVER || stateGame == PAUSE)
+        {
+            if (!drawablebkg)
+            {
+                drawBackground();
+                drawablebkg = true;
+            }
+            drawScore();
             drawBoard();
-            if (this->stateGame == OVER)
+            if (stateGame == OVER)
             {
                 drawGameOver();
+                drawablebkg = false;
+                return;
             }
-            if (this->stateGame == PAUSE)
+            if (stateGame == PAUSE)
             {
                 drawPause();
+                drawablebkg = false;
+                return;
             }
         }
         resetColor();
-        animateCount++;
     }
 
-    void Logic()
+    void
+    Logic()
     {
-        char key = press();
-        switch (stateGame)
+        int key = press();
+        if (stateGame == MENU)
         {
-        case OPENING:
-            // level = 1;
-            // score = 0;
-            // drawable = true;
-            Initialize();
+            drawable = LogicMenu(key);
+            return;
+        }
+        if (stateGame == START)
+        {
+            drawable = LogicStart(key);
+            return;
+        }
+        if (stateGame == PAUSE)
+        {
+            drawable = LogicPause(key);
+            return;
+        }
+        if (stateGame == OVER && key == KEY_ESC)
+        {
             stateGame = MENU;
-            break;
-        case MENU:
-            if(press()){
-                stateGame = START;
-                level = 1;
-                score = 0;
-                drawable = true;
-            }
-            break;
-        case START:
             drawable = true;
-            if (key == KEY_ESC)
-            {
-                stateGame = PAUSE;
-            }
-            else
-            {
-                player->Move(key);
-                Point position = player->GetPosition();
-                if (player->Collide(&position))
-                {
-                    stateGame = OVER;
-                }
-                if (enemy->Collide(&position))
-                {
-                    enemy->Move();
-                }
-                else
-                {
-                    player->Step();
-                }
-            }
-            break;
-        case PAUSE:
-
-            if (key == KEY_ESC)
-            {
-                stateGame = START;
-                drawable = true;
-            }
-            break;
-        case OVER:
-            if (key != KEY_EMPTY)
-            {
-                stateGame = OPENING;
-                drawable = true;
-            }
-            break;
+            return;
+        }
+        if (stateGame == OPENING && stepAnimation(12))
+        {
+            stateGame = MENU;
+            drawable = true;
+            animateCount = 0;
         }
     }
 
 private:
+    ICanvas *canvas;
     Fruit *enemy;
     Snake *player;
     int score;
-    int level;
 
     void Initialize()
     {
-        player = new Snake(BOARD_WIDTH / 2, BOARD_HEIGHT / 2);
-        enemy = new Fruit();
-        stateGame = OPENING;
-        level = 1;
+        player->resetPosition(BOARD_WIDTH / 2, BOARD_HEIGHT / 2);
+        enemy->Move();
+        stateGame = START;
         score = 0;
         animateCount = 0;
-        drawable = true;
-        FPS = 2;
+        FPS = 3;
     }
+
+    bool inBoard(Point value)
+    {
+        bool crash = (0 <= value.x && value.x < BOARD_WIDTH) && (0 <= value.y && value.y < BOARD_HEIGHT);
+        return crash;
+    }
+
     void drawBackground()
     {
         colorGraphic(YELLOW, LIGHTGREY);
@@ -132,45 +132,25 @@ private:
         {
             DrawBarHorizontal(1, y, SCREEN_WIDTH, CHAR_SOLID_50);
         }
-    }
-    void drawOpenning()
-    {
-        colorGraphic(GREEN, RED);
-        DrawWindow(BOARD_MARGIN_X, BOARD_MARGIN_Y, 32, 6);
-        DrawString(BOARD_MARGIN_X + 1, BOARD_MARGIN_Y + 1, "         Snake en C++          ");
-        DrawString(BOARD_MARGIN_X + 1, BOARD_MARGIN_Y + 2, "         by Otomatico          ");
-        DrawString(BOARD_MARGIN_X + 1, BOARD_MARGIN_Y + 3, "                               ");
-        DrawString(BOARD_MARGIN_X + 1, BOARD_MARGIN_Y + 4, "        Press any key          ");
+        colorGraphic(BLUE, CYAN);
+        DrawBarHorizontal(1, 1, SCREEN_WIDTH, CHAR_SOLID_25);
+        colorGraphic(WHITE, RED);
+        DrawChar(SCREEN_WIDTH, 1, 0x9e);
         resetColor();
     }
 
-    void drawBoard()
+    void drawOpenning()
     {
-        colorGraphic(WHITE, LIGHTGREY);
-        DrawWindow(BOARD_MARGIN_X - 1, BOARD_MARGIN_Y - 1, BOARD_WIDTH, BOARD_HEIGHT);
-        for (int row = 0; row < BOARD_HEIGHT; row++)
-        {
-            DrawBarHorizontal(BOARD_MARGIN_X, BOARD_MARGIN_Y + row, BOARD_WIDTH, CHAR_SOLID_50);
-        }
-    }
-
-    void drawTail()
-    {
-        textcolor(GREEN);
-        for (Point tail : player->GetPositions())
-        {
-            DrawChar(tail.x, tail.y, CHAR_SOLID);
-        }
-        textcolor(LIGHTGREEN);
-        Point head = player->GetPosition();
-        DrawChar(head.x, head.y, CHAR_SOLID);
-    }
-
-    void drawFruit()
-    {
-        Point head = enemy->GetPosition();
-        textcolor(LIGHTRED);
-        DrawChar(head.x, head.y, CHAR_SOLID);
+        const int margin_x = SCREEN_WIDTH / 2 - 16;
+        colorGraphic(BLACK, LIGHTGREEN);
+        DrawString(margin_x, BOARD_MARGIN_Y + 1, "          Snake en C++          ");
+        DrawString(margin_x, BOARD_MARGIN_Y + 2, "          by Otomatico          ");
+        DrawString(margin_x, BOARD_MARGIN_Y + 4, "       Press [ESC]  Exit        ");
+        DrawString(margin_x, BOARD_MARGIN_Y + 5, "    Press [SPACE] Start Game    ");
+        DrawBarHorizontal(margin_x, BOARD_MARGIN_Y, 32, CHAR_EMPTY);
+        DrawBarHorizontal(margin_x, BOARD_MARGIN_Y + 3, 32, CHAR_EMPTY);
+        DrawBarHorizontal(margin_x, BOARD_MARGIN_Y + 6, 32, CHAR_EMPTY);
+        resetColor();
     }
 
     void drawPause()
@@ -178,148 +158,173 @@ private:
         resetColor();
         DrawWindow(BOARD_MARGIN_X, BOARD_MARGIN_Y, 32, 6);
         DrawString(BOARD_MARGIN_X + 1, BOARD_MARGIN_Y + 1, "           Game Pause          ");
-        DrawString(BOARD_MARGIN_X + 1, BOARD_MARGIN_Y + 2, "                               ");
         DrawString(BOARD_MARGIN_X + 1, BOARD_MARGIN_Y + 3, "       Press [ESC]  Exit       ");
-        DrawString(BOARD_MARGIN_X + 1, BOARD_MARGIN_Y + 4, "     Press [Intro] Reboot      ");
-        DrawString(BOARD_MARGIN_X + 1, BOARD_MARGIN_Y + 5, "     Press [Space] continue    ");
+        DrawString(BOARD_MARGIN_X + 1, BOARD_MARGIN_Y + 4, "     Press [Space] continue    ");
+        DrawBarHorizontal(BOARD_MARGIN_X + 1, BOARD_MARGIN_Y + 2, 31, CHAR_EMPTY);
     }
 
     void drawGameOver()
     {
-        colorGraphic(RED, DARKGREY);
-        DrawWindow(BOARD_MARGIN_X, BOARD_MARGIN_Y, 32, 4);
-        DrawString(BOARD_MARGIN_X+1, BOARD_MARGIN_Y + 1, "          Game Over           ");
-        DrawString(BOARD_MARGIN_X+1, BOARD_MARGIN_Y + 2, "                              ");
-        DrawString(BOARD_MARGIN_X+1, BOARD_MARGIN_Y + 3, "      Press any continue      ");
-
+        colorGraphic(MAGENTA, BLACK);
+        DrawWindow(BOARD_MARGIN_X, BOARD_MARGIN_Y, 32, 5);
+        DrawString(BOARD_MARGIN_X + 1, BOARD_MARGIN_Y + 1, "          Game Over            ");
+        DrawString(BOARD_MARGIN_X + 1, BOARD_MARGIN_Y + 3, "      Press [ESC] continue     ");
+        DrawBarHorizontal(BOARD_MARGIN_X + 1, BOARD_MARGIN_Y + 2, 31, CHAR_EMPTY);
+        resetColor();
     }
 
-    void drawGameScore()
+    void drawScore()
+    {        
+        colorGraphic(DARKGREY, LIGHTGREY);
+        DrawBarHorizontal(1,SCREEN_HEIGHT-1,SCREEN_WIDTH,CHAR_EMPTY);
+        gotoxy(70,SCREEN_HEIGHT-1); printf("SCORE %03d",score);        
+        resetColor();
+    }
+
+    void drawBoard()
     {
-        colorGraphic(DARKGREY, WHITE);
-        DrawString(1, 1, " █▀▀ █▌ █  █▀█  █ ▄▀ █▀▀   ┌─────────────────────────────╖  ");
-        DrawString(1, 2, " ▀▀█ █▀▄█ ▐█▄█▌ ██▄  █▀    │ SCORE: 0000      LEVEL: 000 ║  "); //, this->score, this->level);
-        DrawString(1, 3, " ▀▀▀ ▀  ▀ ▀▀ ▀▀ ▀  ▀ ▀▀▀   └─────────────────────────────╜  ");
+        canvas->Clear();
+        // drawTail
+        for (Point tail : player->GetPositions())
+        {
+            canvas->SetPixel(tail.x, tail.y);
+        }
+        Point value = player->GetPosition();
+        canvas->SetPixel(value.x, value.y);
+
+        // drawFruit
+        value = enemy->GetPosition();
+        canvas->SetPixel(value.x, value.y);
+
+        colorGraphic(WHITE, DARKGREY);
+        canvas->Draw(BOARD_MARGIN_X, BOARD_MARGIN_Y);
     }
 
-    /*
-        void DrawMenu()
+    bool LogicMenu(int key)
+    {
+        if (key == KEY_SPACE)
         {
-            short Y = (BOARD_HEIGHT - 2) / 2;
-            DrawWindow(10, Y - 1, SCREEN_WIDTH - 20, 4);
-            DrawString((SCREEN_WIDTH - 28) / 2, Y, "Flappy Bird en C++ con Clase");
-            DrawString((SCREEN_WIDTH - 13) / 2, Y + 1, "by Otomatico");
-            if (animateCount % 4 == 0)
-            {
-                DrawString((SCREEN_WIDTH - 14) / 2, Y + 5, "Press any key");
-            }
+            Initialize();
+            return true;
         }
-        void DrawPause()
+        if (key == KEY_ESC)
         {
-            textcolor(WHITE);
-            short X = (BOARD_WIDTH - 5) / 2;
-            short Y = (BOARD_HEIGHT - 1) / 2;
-            DrawWindow(X - 5, Y - 1, 15, 3);
-            DrawString(X, Y, "PAUSE");
+            stateGame = EXIT;
+            return true;
         }
-        void DrawGameOver()
-        {
-            short Y = BOARD_HEIGHT / 2;
-            textcolor(LIGHTRED);
-            DrawString(BOARD_WIDTH + 6, Y, "Game Over!");
-            textcolor(YELLOW);
-            DrawString(BOARD_WIDTH + 2, Y + 1, "Final");
-            DrawScore();
-            bell();
-        }
-        void DrawBird()
-        {
-            Point bird = player->GetPosition();
-            textcolor(YELLOW);
-            DrawChar(bird.x, bird.y, 0xfe);
-            resetColor();
-        }
-        void DrawScore()
-        {
-            gotoxy(BOARD_WIDTH + 8, (BOARD_HEIGHT / 2) + 1);
-            printf("Score: %03d", score);
-            resetColor();
-        }
-        void DrawBase()
-        {
+        return false;
+    }
 
-            colorGraphic(LIGHTGREY, RED);
-            DrawBarHorizontal(1, BOARD_HEIGHT, BOARD_WIDTH, 0xb2);
-            resetColor();
-
-            textcolor(DARKGREY);
-            DrawBarHorizontal(BOARD_WIDTH + 1, BOARD_HEIGHT, SCREEN_WIDTH - BOARD_WIDTH - 2, 0xdc);
-            DrawBarVertical(BOARD_WIDTH, 1, BOARD_HEIGHT, 0xdb);
-            DrawBarHorizontal(BOARD_WIDTH + 1, 1, SCREEN_WIDTH - BOARD_WIDTH - 2, 0xdf);
-            DrawBarVertical(SCREEN_WIDTH - 1, 1, BOARD_HEIGHT, 0xdb);
-
-            textcolor(LIGHTGREY);
-            DrawScore();
-        }
-        void DrawPipe()
+    bool LogicStart(int key)
+    {
+        if (key == KEY_ESC)
         {
-            for (int index = 0; index < MAX_PIPE; index++)
-            {
-                Point pipe = enemy[index]->GetPosition();
-                short gap = pipe.y + GAP;
-                textcolor(GREEN);
-                DrawBarVertical(pipe.x, 1, pipe.y, 0xdb);
-                DrawBarVertical(pipe.x, gap, BOARD_HEIGHT - gap, 0xdb);
-            }
+            stateGame = PAUSE;
+            return true;
         }
 
-        void LogicPause()
+        player->Move(key);
+        Point position = player->GetPosition();
+        if (!inBoard(position) || player->Collide(&position))
         {
-            char key = press();
-            if (key == KEY_ESC)
-            {
-                stateGame = START;
-                drawable = true;
-            }
+            stateGame = OVER;
+            return true;
         }
-        void LogicGameLoop()
+        if (enemy->Collide(&position))
         {
-            char key = press();
-            if (key == KEY_ESC)
-            {
-                stateGame = PAUSE;
-            }
-            else
-            {
-                player->Move(key);
-                Point bird = player->GetPosition();
-                stateGame = bird.y >= BOARD_HEIGHT ? OVER : START;
-                for (short index = 0; index < MAX_PIPE && stateGame != OVER; index++)
-                {
-                    if (enemy[index]->Collide(&bird))
-                    {
-                        stateGame = OVER;
-                        animateCount = 0;
-                    }
-                    else
-                    {
-                        bool passed = enemy[index]->Move();
-                        score += passed ? 1 : 0;
-                    }
-                }
-            }
-            drawable = true;
+            enemy->Move();
+            score++;
+            return true;
         }
-        void LogicMenu()
+        player->Step();
+        return true;
+    }
+    
+    bool LogicPause(int key)
+    {
+        if (key == KEY_ESC)
         {
-            FPS = 2;
-            animateCount = stepAnimation(8) ? 0 : animateCount;
-            if (press())
-            {
-                Initialize();
-                stateGame = START;
-                FPS = 3;
-            }
+            stateGame = MENU;
+            return true;
         }
-        */
+        if (key == KEY_SPACE)
+        {
+            stateGame = START;
+            return true;
+        }
+        return false;
+    }
 };
+
+/*
+
+    
+        BYTE S[]={
+            0b00111110,
+            0b01100000,
+            0b01000000,
+            0b01100000,
+            0b00111100,
+            0b00000110,
+            0b00000010,
+            0b00000110,
+            0b01111100
+        };
+        BYTE N[]={
+            0b00000000,
+            0b01000010,
+            0b01000010,
+            0b01100010,
+            0b01110010,
+            0b01011010,
+            0b01001110,
+            0b01000010
+        };
+        BYTE A[]={
+            0b00000000,
+            0b00111100,
+            0b01000010,
+            0b01000010,
+            0b01111110,
+            0b01000010,
+            0b01000010,
+            0b01000010
+        };
+        BYTE K[]={
+            0b00000000,
+            0b01000010,
+            0b01000100,
+            0b01001000,
+            0b01110000,
+            0b01111100,
+            0b01000010,
+            0b01000010
+        };
+        BYTE E[]={
+            0b00000000,
+            0b01111110,
+            0b01000000,
+            0b01000000,
+            0b01111100,
+            0b01000000,
+            0b01000000,
+            0b01111110
+        };
+        
+    
+    void drawTail()
+    {
+        for (Point tail : player->GetPositions())
+        {
+            canvas->SetPixel(tail.x, tail.y);
+        }
+        Point value = player->GetPosition();
+        canvas->SetPixel(value.x, value.y);
+    }
+
+    void drawFruit()
+    {
+        Point value = enemy->GetPosition();
+        canvas->SetPixel(value.x, value.y);
+    }
+*/

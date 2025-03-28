@@ -41,10 +41,15 @@ int _kbhit()
 #endif
 
 // Constante para GamePAD
-#define KEY_UP 38
-#define KEY_DOWN 39
-#define KEY_RIGHT 40
-#define KEY_LEFT 41
+//#define KEY_UP 38
+//#define KEY_DOWN 39
+//#define KEY_RIGHT 40
+//#define KEY_LEFT 41
+
+#define KEY_UP 72
+#define KEY_DOWN 80
+#define KEY_LEFT 75
+#define KEY_RIGHT 77
 
 #define KEY_ESC 27
 #define KEY_SPACE 32
@@ -53,27 +58,27 @@ int _kbhit()
 #define KEY_B 115
 #define KEY_EMPTY 0
 
-char press()
+int press()
 {
-    char key = KEY_EMPTY;
+    int key = KEY_EMPTY;
     if (_kbhit())
     {
         key = _getch();
         switch (key)
         {
-        default:
-            key = KEY_EMPTY;
-            break;
-        case KEY_UP:
-        case KEY_DOWN:
-        case KEY_RIGHT:
-        case KEY_LEFT:
-        case KEY_ESC:
-        case KEY_SPACE:
-        case KEY_ENTER:
-        case KEY_A:
-        case KEY_B:
-            break;
+            case KEY_UP:
+            case KEY_DOWN:
+            case KEY_RIGHT:
+            case KEY_LEFT:
+            case KEY_ESC:
+            case KEY_SPACE:
+            case KEY_ENTER:
+            case KEY_A:
+            case KEY_B:
+                break;
+            default:
+                key = KEY_EMPTY;
+                break;
         }
     }
     return key;
