@@ -1,13 +1,14 @@
 @ECHO off
 REM CLS
+ECHO Si no sabe que hacer escriba:
+ECHO build.bat main snake
+ECHO -------------------------------------
 
-ECHO off
 ECHO   Setup required Environment
 ECHO -------------------------------------
 REM GCC
 SET "COMPILER_PATH=C:\mingw64\bin"
-REM SET "CC=%COMPILER_PATH%\g++.exe"
-SET "CC=%COMPILER_PATH%\gcc.exe"
+SET "CC=%COMPILER_PATH%\g++.exe"
 SET "ENV=RELEASE"
 SET "CFLAGS2=-O3"
 IF DEBUG == %ENV% SET "CFLAGS2=-Wall -Wextra -g3"
@@ -25,8 +26,6 @@ IF EXIST output\%ROM_NAME%.exe del /F output\%ROM_NAME%.exe
 REM ECHO off
 ECHO   Compile program
 ECHO -----------------------
-REM %CC% -o ./output/%ROM_NAME%_cpp.exe ./src/%FILENAME%.cpp %CFLAGS2%
-%CC% -o ./output/%ROM_NAME%_c.exe ./src/%FILENAME%.c %CFLAGS2%
+%CC% -o ./output/%ROM_NAME%.exe ./src/%FILENAME%.cpp %CFLAGS2%
 @ECHO on
-REM Si no sabe que hacer escriba:
-REM build.bat main flappy
+
