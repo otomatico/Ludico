@@ -1,7 +1,8 @@
 
 #ifndef _GAME_H_
-#include "lib/Utils.hpp"
 #define _GAME_H_
+#include "lib/Entities.cpp"
+#include "lib/keyboard.h"
 class AGame
 {
 protected:

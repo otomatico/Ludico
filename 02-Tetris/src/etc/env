@@ -1,14 +1,16 @@
 #ifndef _ENV_H_
 #define _ENV_H_
 
-#define SCREEN_WIDTH 80
-#define SCREEN_HEIGHT 24
+#define SCREEN_WIDTH 50
+#define SCREEN_HEIGHT 50
 
+#define PIXEL_SIZE 3
 #define BOARD_WIDTH  10
 #define BOARD_HEIGHT 16
 
-#define BOARD_MARGIN_X 1
+#define BOARD_MARGIN_X 4
 #define BOARD_MARGIN_Y 1
+
 
 //#define LINUX       // Si quieres compilar en linux, por defecto es para windows
 #endif
