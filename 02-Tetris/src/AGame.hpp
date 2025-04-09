@@ -13,16 +13,15 @@ protected:
 
 public:
     virtual void Draw() = 0;
-    virtual void Logic() = 0;
+    virtual bool Logic() = 0;
     int Run()
     {
         while (stateGame != EXIT)
         {
-            Logic();
+            drawable = Logic();
             if (drawable) // evitar parpadeo
             {
                 Draw();
-                drawable = false;
             }
             Sleep(1000 / FPS); // Controla a velocidade del Jogo
         }

@@ -2,22 +2,46 @@
 #include "lib/keyboard.h"
 #include <string>
 
+using Matrix4x4 = bool[4][4];  
+
+const Matrix4x4 SHAPES[7] =
+    {
+        {{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {1, 1, 1, 1}}, // SHAPE_I
+        {{0, 0, 0, 0}, {0, 1, 0, 0}, {0, 1, 0, 0}, {1, 1, 0, 0}}, // SHAPE_J
+        {{0, 0, 0, 0}, {0, 1, 0, 0}, {0, 1, 0, 0}, {0, 1, 1, 0}}, // SHAPE_L
+        {{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 1, 1, 0}, {0, 1, 1, 0}}, // SHAPE_O
+        {{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 1, 1}, {0, 1, 1, 0}}, // SHAPE_S
+        {{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 1, 1, 1}, {0, 0, 1, 0}}, // SHAPE_T
+        {{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 1, 1, 0}, {0, 0, 1, 1}}  // SHAPE_Z
+};
+
 class Piece
 {
 private:
     Point position;
     Point old;
-    int shape[4][4];
+    Matrix4x4 shape;
 
-    void copyShape(const int newShape[4][4])
+    void copyShape(const Matrix4x4 newShape)
     {
         memcpy(shape, newShape, sizeof(shape));
     }
 
 public:
+    Piece()
+    {
+        position.x = 4;
+        position.y = 0;
+
+        int index = rand() % 7;
+        copyShape(SHAPES[index]);
+    }
+    ~Piece()
+    {
+    }
     void Rotate(int angle)
     {
-        int rotated[4][4];
+        Matrix4x4 rotated;
         for (int row = 0; row < 4; row++)
         {
             for (int col = 0; col < 4; col++)
@@ -37,23 +61,27 @@ public:
 
     void Move(int key)
     {
-        old = position;
-        switch (key)
-        {
-        case KEY_LEFT:
-            position.x--;
-            break;
-        case KEY_RIGHT:
-            position.x++;
-            break;
-        case KEY_DOWN:
-            position.y++;
-            break;
-        case KEY_UP:
-            Rotate(1);
-            break;
-        }
         position.y++;
+        old = position;
+        if (key == KEY_LEFT)
+        {
+            position.x--;
+            return;
+        }        
+        if (key == KEY_RIGHT)
+        {
+            position.x++;
+            return;
+        }
+        if (key == KEY_DOWN)
+        {
+            position.y++;
+            return;
+        }
+        if (key == KEY_UP)
+        {
+            Rotate(1);
+        }
     }
 
     void RollBack(int key)
@@ -63,11 +91,17 @@ public:
         {
             Rotate(-1);
         }
-        position.y++;
+        //position.y++;
     }
-    
+
     Point GetPosition()
     {
         return position;
     }
+
+    Matrix4x4& GetShape()
+    {
+        return shape;
+    }
 };
+
