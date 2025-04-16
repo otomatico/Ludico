@@ -4,7 +4,7 @@
 #include "lib/Entities.cpp"
 
 #define allocateArray(A, B) (A *)malloc(sizeof(A) * ((B > 0) ? (B) : 1))
-using Matrix4x4 = bool[4][4];  
+using Matrix4x4 = bool[4][4];
 class Board
 {
 private:
@@ -45,6 +45,7 @@ public:
         width = w;
         height = h;
         screen = allocateArray(bool, w *h);
+        memset(screen,false,w*h);
     }
 
     bool Inside(int x, int y)
@@ -62,8 +63,8 @@ public:
                 if (shape[row][col])
                 {
                     int x = position.x + col;
-                    int y = (position.y + row) *width;
-                    hit = Inside(x, y) && screen[y + x];
+                    int y = (position.y + row);
+                    hit = Inside(x, y) && !screen[y * width + x];
                 }
             }
         }

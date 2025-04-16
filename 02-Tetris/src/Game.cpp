@@ -53,9 +53,6 @@ public:
                 currentPiece = new Piece();
                 nextPiece = new Piece();
                 board = new Board(BOARD_WIDTH, BOARD_HEIGHT);
-                // generateNewPiece();
-                // initScreen();
-                // change = 1;
                 stateGame = START;
                 score = 0;
                 level = 1;
@@ -69,7 +66,8 @@ public:
             Matrix4x4 &shape = currentPiece->GetShape();
             if (board->Collide(piecePosition, shape))
             {
-                if (piecePosition.y != 0)
+                gotoXY(60,1);printf("x:%d y:%d",piecePosition.x,piecePosition.y);
+                if (piecePosition.y == 0)
                 {
                     board->solidifyPiece(piecePosition, shape);
                     score += board->clearRows() * 100;
@@ -160,13 +158,14 @@ private:
         canvas->Clear();
         Point positionShape = currentPiece->GetPosition();
         Matrix4x4 &shape = currentPiece->GetShape();
-        drawShape(positionShape.x, positionShape.y, shape, canvas, MAGENTA);
+        drawShape(positionShape.x*PIXEL_SIZE, positionShape.y*PIXEL_SIZE, shape, canvas, MAGENTA);
         canvas->Draw(BOARD_MARGIN_X, BOARD_MARGIN_Y);
 
         resetColor();
     }
     void drawShape(int x, int y, Matrix4x4 shape, CanvasColor *context, BYTE color = RED)
     {
+        
         for (int row = 0; row < 4; row++)
         {
             for (int col = 0; col < 4; col++)
