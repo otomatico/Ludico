@@ -1,27 +1,9 @@
+#include "ICanvas.h"
 #ifndef _CANVAS_H_
 #define _CANVAS_H_
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#define BYTE unsigned char
-#define WORD unsigned int
 
 #define colorGraphic(front, back) printf("\e[%d;%d;%dm", front & 0x8 ? 1 : 0, (back & 0x7) + (back & 0x8 ? 100 : 40), (front & 0x7) + 30)
 #define resetColor() printf("\e[0m")
-#define gotoXY(X, Y) printf("\e[%d;%dH", (Y), (X))
-// #define cleaner() system("cls")
-
-#define hidecursor() printf("\e[?25l")
-#define showcursor() printf("\e[?25h")
-#define cleaner() printf("\e[1;1H\e[2J\e[0m")
-
-#define DrawChar(x, y, c) printf("\e[%d;%dH%c", y, x, c)
-#define DrawInt(x, y, i) printf("\e[%d;%dH%d", y, x, i)
-#define DrawString(x, y, s) printf("\e[%d;%dH%s", y, x, s)
-
-#define allocateArray(A, B) (A *)malloc(sizeof(A) * ((B > 0) ? (B) : 1))
-
-#define CHAR_UPPER 0xdf
 
 // COLORES
 #define BLACK 0x0
@@ -43,9 +25,9 @@
 
 struct Pixel
 {
-    BYTE color; // foreground (4 bits bajos) | background (4 bits altos)
+    BYTE color; // foreground (4 bits altos) | background (4 bits bajos)
 };
-class CanvasColor
+class Canvas4bits : public ICanvas
 {
 protected:
     int width;
@@ -76,14 +58,14 @@ private:
     }
 
 public:
-    CanvasColor(int width, int height)
+    Canvas4bits(int width, int height)
     {
         this->width = width;
         this->height = height; // Altura física (ej: 6 filas = 3 caracteres)
         _Initialize();
     }
 
-    ~CanvasColor() { free(buffer); }
+    ~Canvas4bits() { free(buffer); }
 
     void Clear(BYTE color = BLACK)
     {
@@ -100,31 +82,6 @@ public:
             int logicalY = y / 2;
             bool isUpper = (y % 2 == 0);
             _UpdatePixelColor(x, logicalY, color, isUpper);
-        }
-    }
-    void SetLine(int sx, int sy, int ex, int ey, BYTE color)
-    {
-        for (int y = sy; y <= ey; y++)
-        {
-            for (int x = sx; x <= ex; x++)
-            {
-                SetPixel(x, y, color);
-            }
-        }
-    }
-    void SetLineDot(int sx, int sy, int ex, int ey, BYTE color)
-    {
-        bool dot = true;
-        for (int y = sy; y <= ey; y++)
-        {
-            for (int x = sx; x <= ex; x++)
-            {
-                if (dot)
-                {
-                    this->SetPixel(x, y, color);
-                }
-                dot = !dot;
-            }
         }
     }
     void Draw(int startX, int startY)

@@ -52,5 +52,6 @@ public:
     virtual void Clear() = 0;
     virtual void SetPixel(int x, int y, int pixel = 1) = 0;
     virtual void Draw(int startX, int startY) = 0;
+    virtual void SetLine(int x0, int y0, int x1, int y1, int pixel=1)=0;
 };
 #endif
