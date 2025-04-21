@@ -1,13 +1,7 @@
+#include "Enum.h"
 #ifndef _ELEMENT_H_
 #define _ELEMENT_H_
 
-typedef struct
-{
-    short x;
-    short y;
-} Point;
-
-// Base class
 class IElement
 {
 public:

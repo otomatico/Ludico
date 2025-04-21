@@ -1,6 +1,6 @@
-#include "lib/IElement.hpp"
-#include "lib/keyboard.h"
-#include "etc/env"
+#include "../domain/IElement.h"
+#include "../env"
+#include "../infrastructure/Utils.cpp"
 #include <iostream>
 #include <list>
 using namespace std;

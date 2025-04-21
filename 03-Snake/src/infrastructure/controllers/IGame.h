@@ -1,13 +1,13 @@
 
 #ifndef _GAME_H_
-#include "lib/Utils.hpp"
+#include "../../env"
+#include "../../domain/Enum.h"
+#include "../Utils.cpp"
 #define _GAME_H_
 class IGame
 {
 protected:
     int FPS;
-    bool drawable;
-    int animateCount;
     StateGame stateGame;
 
 public:
@@ -18,13 +18,10 @@ public:
         while (stateGame != EXIT)
         {
             Logic();
-            if (drawable) // evitar parpadeo
-            {
-                Draw();
-                drawable = false;
-            }
+            Draw();
             Sleep(1000 / FPS); // Controla a velocidade del Jogo
         }
+        cleaner();
         return 0;
     }
 };

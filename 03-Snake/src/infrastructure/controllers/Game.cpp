@@ -1,11 +1,9 @@
-#include "IGame.hpp"
+#include "IGame.h"
 /**Estos #include estam aqui porque es proprio de la clase */
-#include "etc/env"
-#include "lib/Utils.cpp"
-#include <string.h>
-#include "Fruit.cpp"
-#include "Snake.cpp"
-#include "lib/CanvasMonocrome.cpp"
+#include "../display/Canvas1bit.cpp"
+#include "../input/keyboard.h"
+#include "../../application/Fruit.cpp"
+#include "../../application/Snake.cpp"
 
 #define stepAnimation(step) ++animateCount > step
 
@@ -19,7 +17,7 @@ public:
         stateGame = OPENING;
         animateCount = 0;
         drawable = true;
-        canvas = new CanvasMonocrome(BOARD_WIDTH, BOARD_HEIGHT);
+        canvas = new Canvas1bit(BOARD_WIDTH, BOARD_HEIGHT);
         player = new Snake();
         enemy = new Fruit();
         hidecursor();
@@ -30,42 +28,51 @@ public:
     }
     void Draw()
     {
-        static bool drawablebkg = false;
-        gotoxy(1, 1);
 
+        gotoXY(1, 1);
         if (stateGame == OPENING)
         {
-            drawBackground();
+            if (drawable)
+            {
+                drawBackground();
+                drawable = false;
+            }
             return;
         }
 
         if (stateGame == MENU)
         {
-            drawBackground();
-            drawOpenning();
+            if (drawable)
+            {
+                drawBackground();
+                drawOpenning();
+                drawable = false;
+            }
             return;
         }
         if (stateGame == START || stateGame == OVER || stateGame == PAUSE)
         {
-            if (!drawablebkg)
+            if (drawable)
             {
                 drawBackground();
-                drawablebkg = true;
+                drawScore();
             }
-            drawScore();
-            drawBoard();
-            if (stateGame == OVER)
+
+            if (stateGame == START)
             {
+                drawBoard();
+            }
+            if (stateGame == OVER && drawable)
+            {
+                drawBoard();
                 drawGameOver();
-                drawablebkg = false;
-                return;
             }
-            if (stateGame == PAUSE)
+            if (stateGame == PAUSE && drawable)
             {
+                drawBoard();
                 drawPause();
-                drawablebkg = false;
-                return;
             }
+            drawable = false;
         }
         resetColor();
     }
@@ -104,6 +111,8 @@ public:
     }
 
 private:
+    bool drawable;
+    int animateCount;
     ICanvas *canvas;
     Fruit *enemy;
     Snake *player;
@@ -174,10 +183,11 @@ private:
     }
 
     void drawScore()
-    {        
+    {
         colorGraphic(DARKGREY, LIGHTGREY);
-        DrawBarHorizontal(1,SCREEN_HEIGHT-1,SCREEN_WIDTH,CHAR_EMPTY);
-        gotoxy(70,SCREEN_HEIGHT-1); printf("SCORE %03d",score);        
+        DrawBarHorizontal(1, SCREEN_HEIGHT - 1, SCREEN_WIDTH, CHAR_EMPTY);
+        gotoXY(70, SCREEN_HEIGHT - 1);
+        printf("SCORE %03d", score);
         resetColor();
     }
 
@@ -187,17 +197,17 @@ private:
         // drawTail
         for (Point tail : player->GetPositions())
         {
-            canvas->SetPixel(tail.x, tail.y);
+            canvas->SetPixel(tail.x, tail.y, WHITE);
         }
         Point value = player->GetPosition();
-        canvas->SetPixel(value.x, value.y);
+        canvas->SetPixel(value.x, value.y, WHITE);
 
         // drawFruit
         value = enemy->GetPosition();
-        canvas->SetPixel(value.x, value.y);
+        canvas->SetPixel(value.x, value.y, WHITE);
 
         colorGraphic(WHITE, DARKGREY);
-        canvas->Draw(BOARD_MARGIN_X, BOARD_MARGIN_Y);
+        canvas->Draw((SCREEN_WIDTH - BOARD_WIDTH) / 2, BOARD_MARGIN_Y);
     }
 
     bool LogicMenu(int key)
@@ -237,9 +247,9 @@ private:
             return true;
         }
         player->Step();
-        return true;
+        return false;
     }
-    
+
     bool LogicPause(int key)
     {
         if (key == KEY_ESC)
@@ -257,8 +267,6 @@ private:
 };
 
 /*
-
-    
         BYTE S[]={
             0b00111110,
             0b01100000,
@@ -310,8 +318,8 @@ private:
             0b01000000,
             0b01111110
         };
-        
-    
+
+
     void drawTail()
     {
         for (Point tail : player->GetPositions())

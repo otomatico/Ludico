@@ -1,6 +1,6 @@
-#include "lib/IElement.hpp"
-#include <stdlib.h>   // srand, rand
-#include "etc/env"
+#include "../domain/IElement.h"
+#include "../env"
+#include <stdlib.h> // srand, rand
 
 class Fruit : public IElement
 {
@@ -15,6 +15,7 @@ public:
     {
         Initialize();
     }
+
 private:
     void Initialize()
     {
