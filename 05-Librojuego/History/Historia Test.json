@@ -1,0 +1,29 @@
+{
+  "meta": {
+	  "title": "Título del librojuego",
+    "author": "Autor",
+    "created_at": "2023-11-08"
+  },
+  "start_node_id": "intro",
+  "nodes": [
+    {
+      "id": "intro",
+      "text": "Estás en un bosque oscuro. ¿Qué haces?",
+      "options": [
+        {
+          "text": "Explorar la cabaña",
+          "next_node_id": "cabin"
+        },
+        {
+          "text": "Huir del bosque",
+          "next_node_id": "escape"
+        }
+      ]
+    },
+    {
+      "id": "cabin",
+      "text": "Encuentras una cabaña misteriosa...",
+      "options": []
+    }
+  ]
+}

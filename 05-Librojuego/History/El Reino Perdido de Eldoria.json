@@ -1,0 +1,507 @@
+{
+  "meta": {
+    "title": "El Reino Perdido de Eldoria",
+    "author": "Aventuras Interactivas",
+    "created_at": "2023-11-20",
+    "coverImage": null
+  },
+  "start_node_id": "node-1",
+  "nodes": [
+    {
+      "id": "node-1",
+      "text": "Te despiertas en una posada desconocida. Un anciano con túnica azul te observa desde la esquina. ¿Qué haces?",
+      "options": [
+        {
+          "text": "Acercarte al anciano",
+          "nextNodeId": "node-2"
+        },
+        {
+          "text": "Salir rápidamente de la posada",
+          "nextNodeId": "node-3"
+        }
+      ]
+    },
+    {
+      "id": "node-2",
+      "text": "El anciano susurra: 'Busco al elegido... ¿Aceptas llevar el Cristal de Eldoria?'",
+      "options": [
+        {
+          "text": "Aceptar el cristal",
+          "nextNodeId": "node-4"
+        },
+        {
+          "text": "Rechazar y salir corriendo",
+          "nextNodeId": "node-5"
+        }
+      ]
+    },
+    {
+      "id": "node-3",
+      "text": "Al salir, te encuentras con un grupo de mercenarios que te rodean. Uno sonríe y dice: 'El jefe quiere verte'.",
+      "options": [
+        {
+          "text": "Seguir a los mercenarios",
+          "nextNodeId": "node-6"
+        },
+        {
+          "text": "Intentar huir",
+          "nextNodeId": "node-7"
+        }
+      ]
+    },
+    {
+      "id": "node-4",
+      "text": "El cristal brilla en tu mano. De repente, la posada desaparece y te encuentras en un bosque encantado.",
+      "options": [
+        {
+          "text": "Explorar el bosque",
+          "nextNodeId": "node-8"
+        },
+        {
+          "text": "Buscar refugio",
+          "nextNodeId": "node-9"
+        }
+      ]
+    },
+    {
+      "id": "node-5",
+      "text": "El anciano grita una maldición en una lengua antigua. Sientes un dolor agudo en el pecho y todo se oscurece...",
+      "options": [
+        {
+          "text": "Despertar de nuevo en la posada (reiniciar)",
+          "nextNodeId": "node-1"
+        }
+      ]
+    },
+    {
+      "id": "node-6",
+      "text": "Los mercenarios te llevan ante su líder, una misteriosa mujer con una máscara de plata.",
+      "options": [
+        {
+          "text": "Escuchar su propuesta",
+          "nextNodeId": "node-10"
+        },
+        {
+          "text": "Intentar atacarla",
+          "nextNodeId": "node-11"
+        }
+      ]
+    },
+    {
+      "id": "node-7",
+      "text": "Corres por callejones oscuros, pero tropiezas con un barril. Los mercenarios te alcanzan.",
+      "options": [
+        {
+          "text": "Rendirte",
+          "nextNodeId": "node-6"
+        },
+        {
+          "text": "Intentar pelear",
+          "nextNodeId": "node-12"
+        }
+      ]
+    },
+    {
+      "id": "node-8",
+      "text": "Entre los árboles ves una luz azul. Al acercarte, descubres un arma legendaria: la Espada de Luminara.",
+      "options": [
+        {
+          "text": "Tomar la espada",
+          "nextNodeId": "node-13"
+        },
+        {
+          "text": "Dejarla donde está",
+          "nextNodeId": "node-14"
+        }
+      ]
+    },
+    {
+      "id": "node-9",
+      "text": "Encuentras una cueva, pero al entrar escuchas gruñidos. Dos ojos rojos brillan en la oscuridad.",
+      "options": [
+        {
+          "text": "Enfrentar a la criatura",
+          "nextNodeId": "node-15"
+        },
+        {
+          "text": "Retirarse silenciosamente",
+          "nextNodeId": "node-16"
+        }
+      ]
+    },
+    {
+      "id": "node-10",
+      "text": "'Únete a nosotros', dice la mujer. 'Juntos podemos derrocar al Rey Brujo de Eldoria'.",
+      "options": [
+        {
+          "text": "Aceptar unirte",
+          "nextNodeId": "node-17"
+        },
+        {
+          "text": "Rechazar la oferta",
+          "nextNodeId": "node-18"
+        }
+      ]
+    },
+    {
+      "id": "node-11",
+      "text": "La mujer esquivó tu ataque con facilidad. 'Pobre tonto', dice mientras sus guardias te reducen.",
+      "options": [
+        {
+          "text": "Ser llevado a prisión",
+          "nextNodeId": "node-19"
+        }
+      ]
+    },
+    {
+      "id": "node-12",
+      "text": "Logras derrotar a dos mercenarios, pero otros tres aparecen con arcos apuntando a tu cabeza.",
+      "options": [
+        {
+          "text": "Rendirte",
+          "nextNodeId": "node-6"
+        }
+      ]
+    },
+    {
+      "id": "node-13",
+      "text": "Al tomar la espada, una voz resuena: 'El portador de Luminara será el salvador o la perdición'.",
+      "options": [
+        {
+          "text": "Continuar el camino",
+          "nextNodeId": "node-20"
+        }
+      ]
+    },
+    {
+      "id": "node-14",
+      "text": "La espada desaparece. Un lobo gigante emerge de los arbustos, gruñendo hambriento.",
+      "options": [
+        {
+          "text": "Correr",
+          "nextNodeId": "node-21"
+        },
+        {
+          "text": "Quedarte quieto",
+          "nextNodeId": "node-22"
+        }
+      ]
+    },
+    {
+      "id": "node-15",
+      "text": "Es un oso cavernario! Logras esquivar sus garras por poco. Tienes una roca afilada a mano.",
+      "options": [
+        {
+          "text": "Atacar con la roca",
+          "nextNodeId": "node-23"
+        },
+        {
+          "text": "Intentar calmarlo",
+          "nextNodeId": "node-24"
+        }
+      ]
+    },
+    {
+      "id": "node-16",
+      "text": "Al retroceder, pisas una rama que se rompe con estruendo. La bestia carga hacia ti!",
+      "options": [
+        {
+          "text": "Prepararte para pelear",
+          "nextNodeId": "node-15"
+        },
+        {
+          "text": "Saltar a un lado",
+          "nextNodeId": "node-25"
+        }
+      ]
+    },
+    {
+      "id": "node-17",
+      "text": "La mujer sonríe bajo su máscara. 'Bienvenido a la Hermandad de la Luna Plateada'.",
+      "options": [
+        {
+          "text": "Recibir tu primera misión",
+          "nextNodeId": "node-26"
+        }
+      ]
+    },
+    {
+      "id": "node-18",
+      "text": "'Lástima', dice la mujer. Sus ojos brillan de color violeta y caes inconsciente.",
+      "options": [
+        {
+          "text": "Despertar en una celda",
+          "nextNodeId": "node-19"
+        }
+      ]
+    },
+    {
+      "id": "node-19",
+      "text": "Estás en una celda oscura. Un niño misterioso aparece entre las sombras. 'Puedo ayudarte a escapar'.",
+      "options": [
+        {
+          "text": "Aceptar su ayuda",
+          "nextNodeId": "node-27"
+        },
+        {
+          "text": "Desconfiar del niño",
+          "nextNodeId": "node-28"
+        }
+      ]
+    },
+    {
+      "id": "node-20",
+      "text": "El bosque se abre ante ti, revelando un antiguo santuario elfo. Hay inscripciones en la entrada.",
+      "options": [
+        {
+          "text": "Leer las inscripciones",
+          "nextNodeId": "node-29"
+        },
+        {
+          "text": "Entrar directamente",
+          "nextNodeId": "node-30"
+        }
+      ]
+    },
+    {
+      "id": "node-21",
+      "text": "Corres pero el lobo es más rápido. Te derriba y sientes sus colmillos en tu pierna.",
+      "options": [
+        {
+          "text": "Intentar golpearlo",
+          "nextNodeId": "node-31"
+        },
+        {
+          "text": "Quedarte inmóvil",
+          "nextNodeId": "node-32"
+        }
+      ]
+    },
+    {
+      "id": "node-22",
+      "text": "El lobo te olfatea, luego retrocede. Detrás de ti aparece una elfa con un arco apuntando al animal.",
+      "options": [
+        {
+          "text": "Agradecer a la elfa",
+          "nextNodeId": "node-33"
+        }
+      ]
+    },
+    {
+      "id": "node-23",
+      "text": "La roca se clava en el ojo del oso, que huye aullando. En la pared ves pinturas antiguas.",
+      "options": [
+        {
+          "text": "Estudiar las pinturas",
+          "nextNodeId": "node-34"
+        },
+        {
+          "text": "Descansar en la cueva",
+          "nextNodeId": "node-35"
+        }
+      ]
+    },
+    {
+      "id": "node-24",
+      "text": "Hablas suavemente y extiendes tu mano. El oso gruñe pero luego se aleja, revelando un pasaje secreto.",
+      "options": [
+        {
+          "text": "Explorar el pasaje",
+          "nextNodeId": "node-36"
+        }
+      ]
+    },
+    {
+      "id": "node-25",
+      "text": "Al saltar, caes por un precipicio oculto en la oscuridad. Milagrosamente, aterrizas sobre musgo blando.",
+      "options": [
+        {
+          "text": "Explorar la caverna subterránea",
+          "nextNodeId": "node-37"
+        }
+      ]
+    },
+    {
+      "id": "node-26",
+      "text": "'Debes infiltrarte en el Castillo del Rey Brujo y robar su Orbe de Visión', te explica la líder.",
+      "options": [
+        {
+          "text": "Aceptar la misión",
+          "nextNodeId": "node-38"
+        },
+        {
+          "text": "Pedir más información",
+          "nextNodeId": "node-39"
+        }
+      ]
+    },
+    {
+      "id": "node-27",
+      "text": "El niño saca una llave de su bolsillo. 'Sígueme, pero no hagas ruido', susurra.",
+      "options": [
+        {
+          "text": "Seguir en silencio",
+          "nextNodeId": "node-40"
+        }
+      ]
+    },
+    {
+      "id": "node-28",
+      "text": "El niño sonríe de manera inquietante. 'Tenías que confiar...'. Sus ojos brillan rojos y todo se oscurece.",
+      "options": [
+        {
+          "text": "Despertar en la celda (reiniciar)",
+          "nextNodeId": "node-19"
+        }
+      ]
+    },
+    {
+      "id": "node-29",
+      "text": "Las inscripciones dicen: 'Solo el digno puede entrar. Prueba tu valor con fuego y sangre'.",
+      "options": [
+        {
+          "text": "Cortar tu mano y tocar la puerta",
+          "nextNodeId": "node-13"
+        },
+        {
+          "text": "Buscar otra entrada",
+          "nextNodeId": "node-30"
+        }
+      ]
+    },
+    {
+      "id": "node-30",
+      "text": "Al entrar, una trampa se activa! Dardos envenenados vuelan hacia ti desde las paredes.",
+      "options": [
+        {
+          "text": "Intentar esquivar",
+          "nextNodeId": "node-15"
+        },
+        {
+          "text": "Usar la espada para bloquear",
+          "nextNodeId": "node-20"
+        }
+      ]
+    },
+    {
+      "id": "node-31",
+      "text": "Tu golpe hace retroceder al lobo, que huye lastimado. Ahora estás herido y perdido en el bosque.",
+      "options": [
+        {
+          "text": "Buscar ayuda",
+          "nextNodeId": "node-22"
+        }
+      ]
+    },
+    {
+      "id": "node-32",
+      "text": "El lobo pierde interés y se aleja. Estás a salvo, pero ahora estás completamente perdido.",
+      "options": [
+        {
+          "text": "Caminar al azar",
+          "nextNodeId": "node-8"
+        }
+      ]
+    },
+    {
+      "id": "node-33",
+      "text": "'No deberías estar aquí, humano', dice la elfa. 'Este bosque es sagrado. Ven conmigo'.",
+      "options": [
+        {
+          "text": "Seguir a la elfa",
+          "nextNodeId": "node-20"
+        },
+        {
+          "text": "Negarse y huir",
+          "nextNodeId": "node-21"
+        }
+      ]
+    },
+    {
+      "id": "node-34",
+      "text": "Las pinturas muestran una profecía sobre un guerrero que salvará Eldoria. ¡El dibujo se parece a ti!",
+      "options": [
+        {
+          "text": "Tocar la pintura",
+          "nextNodeId": "node-4"
+        }
+      ]
+    },
+    {
+      "id": "node-35",
+      "text": "Mientras descansas, sueñas con una ciudad flotante y una voz que te llama por tu nombre...",
+      "options": [
+        {
+          "text": "Despertar renovado",
+          "nextNodeId": "node-24"
+        }
+      ]
+    },
+    {
+      "id": "node-36",
+      "text": "El pasaje te lleva a una cámara con tres puertas: oro, plata y bronce. ¿Cuál eliges?",
+      "options": [
+        {
+          "text": "Puerta de oro",
+          "nextNodeId": "node-17"
+        },
+        {
+          "text": "Puerta de plata",
+          "nextNodeId": "node-26"
+        },
+        {
+          "text": "Puerta de bronce",
+          "nextNodeId": "node-19"
+        }
+      ]
+    },
+    {
+      "id": "node-37",
+      "text": "En la caverna encuentras un estanque luminoso. Al mirar tu reflejo, ves una versión más vieja de ti mismo.",
+      "options": [
+        {
+          "text": "Tocar el agua",
+          "nextNodeId": "node-34"
+        },
+        {
+          "text": "No interferir",
+          "nextNodeId": "node-35"
+        }
+      ]
+    },
+    {
+      "id": "node-38",
+      "text": "Te dan un mapa y un veneno para los guardias. 'Buena suerte', dice la mujer mientras te despides.",
+      "options": [
+        {
+          "text": "Ir al castillo",
+          "nextNodeId": "node-30"
+        }
+      ]
+    },
+    {
+      "id": "node-39",
+      "text": "'El Orbe permite ver el futuro', explica. 'El Rey Brujo lo usa para mantener su poder sobre Eldoria'.",
+      "options": [
+        {
+          "text": "Aceptar la misión ahora",
+          "nextNodeId": "node-38"
+        }
+      ]
+    },
+    {
+      "id": "node-40",
+      "text": "El niño te lleva a través de túneles secretos hasta salir a las afueras de la ciudad. ¡Eres libre!",
+      "options": [
+        {
+          "text": "Unirte a la resistencia",
+          "nextNodeId": "node-17"
+        },
+        {
+          "text": "Huir lejos de la ciudad",
+          "nextNodeId": "node-3"
+        }
+      ]
+    }
+  ]
+}

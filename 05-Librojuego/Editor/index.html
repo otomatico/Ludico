@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor de Librojuegos</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="editor-panel">
+		<div class="menu-horizontal">
+				<button id="import-json">Importar</button>
+				<button id="export-json">Exportar</button>
+				<input type="file" id="json-loader" accept=".json" style="display: none;">
+		</div>
+		<details id="metadata-panel">
+			<summary >Metadatos del Librojuego</summary>				
+			<div>
+				<label>Título:</label>
+				<input type="text" id="book-title">
+			</div>
+			<div>
+				<label>Autor:</label>
+				<input type="text" id="book-author">
+			</div>
+			<div>
+				<label>Portada:</label>
+				<input type="file" id="book-cover" accept="image/png, image/jpeg">
+				<div id="cover-preview" class="image-preview"></div>
+			</div>
+		</details>
+		<details open id="node-panel">
+			<summary>Editor de Nodos</summary>
+			<div class="menu-horizontal">
+				<button id="new-node">+ Nuevo</button>
+				<button id="save-node">Guardar</button>        
+				<button id="delete-node" style="background: #f44336;">Eliminar</button>
+			</div>
+			<details>
+				<summary>Imagen del nodo</summary>
+				<input type="file" id="node-image" accept="image/png, image/jpeg">
+				<div id="node-image-preview" class="image-preview"></div>
+			</details>
+			<br/>
+			<div>
+				<label>Texto del nodo:</label>
+				<textarea id="node-text"></textarea>
+			</div>
+
+			<button id="add-option">+ Añadir Opción</button>
+			<div id="options-container">
+				<h3>Opciones:</h3>
+			</div>		
+		</details>
+    </div>
+
+    <div id="graph-view">
+        <canvas id="graph-canvas"></canvas>
+        <div id="nodes-container"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

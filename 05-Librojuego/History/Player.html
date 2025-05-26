@@ -1,0 +1,132 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Lector de Librojuegos</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        #story-container { background: #f5f5f5; padding: 20px; border-radius: 8px; }
+        button { background: #4CAF50; color: white; border: none; padding: 10px 15px; margin: 5px; cursor: pointer; }
+        button:hover { background: #45a049; }
+        #file-input { margin: 20px 0; }
+
+.story-image {
+    max-width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    margin: 15px auto;
+    display: block;
+}
+    </style>
+</head>
+<body>
+    <h1>Lector de Librojuegos</h1>
+    
+    <!-- Input para cargar el archivo JSON -->
+    <input type="file" id="file-input" accept=".json" />
+    
+    <!-- Contenedor de la historia -->
+    <div id="story-container">
+        <p>Carga un archivo JSON para comenzar...</p>
+    </div>
+
+    <script>
+        let currentStory;
+        let currentNode;
+
+        // 1. Cargar el archivo seleccionado
+        document.getElementById('file-input').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const json = JSON.parse(e.target.result);
+                    loadStory(json);
+                } catch (error) {
+                    alert("¡Error! El archivo no es un JSON válido.");
+                    console.error(error);
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        // 2. Cargar la historia
+        function loadStory(json) {
+            currentStory = json;
+            if (!currentStory.start_node_id || !currentStory.nodes) {
+                alert("El JSON no tiene la estructura correcta.");
+                return;
+            }
+            gotoNode(currentStory.start_node_id);
+        }
+
+        // 3. Navegar entre nodos
+        function gotoNode(nodeId) {
+            currentNode = currentStory.nodes.find(n => n.id === nodeId);
+            if (!currentNode) {
+                alert("¡Fin de la historia!");
+                return;
+            }
+
+            const storyContainer = document.getElementById('story-container');
+            storyContainer.innerHTML = `
+                <h2>${currentStory.meta?.title || 'Librojuego'}</h2>
+                <p>${currentNode.text}</p>
+                <div id="node-options"></div>
+            `;
+
+            const optionsContainer = document.getElementById('node-options');
+            if (currentNode.options && currentNode.options.length > 0) {
+                currentNode.options.forEach(option => {
+                    const button = document.createElement('button');
+                    button.textContent = option.text;
+                    button.onclick = () => gotoNode(option.next_node_id);
+                    optionsContainer.appendChild(button);
+                });
+            } else {
+                optionsContainer.innerHTML = "<p>Fin de la historia.</p>";
+            }
+			// Mostrar imagen del nodo si existe
+			const imageContainer = document.createElement('div');
+			if (currentNode.image) {
+				imageContainer.innerHTML = `<img src="${currentNode.image}" style="max-width: 100%; max-height: 200px; margin: 10px 0; border-radius: 4px;">`;
+			}
+				storyContainer.insertBefore(imageContainer, optionsContainer);
+			}
+    </script>
+</body>
+</html>
+<!--<div id="story-container">
+  <h1 id="node-title"></h1>
+  <p id="node-text"></p>
+  <div id="node-options"></div>
+</div>
+
+<script>
+  let currentStory;
+  let currentNode;
+
+  function loadStory(json) {
+    currentStory = JSON.parse(json);
+    gotoNode(currentStory.start_node_id);
+  }
+
+  function gotoNode(nodeId) {
+    currentNode = currentStory.nodes.find(n => n.id === nodeId);
+    document.getElementById("node-text").textContent = currentNode.text;
+    
+    const optionsContainer = document.getElementById("node-options");
+    optionsContainer.innerHTML = "";
+    
+    currentNode.options.forEach(option => {
+      const button = document.createElement("button");
+      button.textContent = option.text;
+      button.onclick = () => gotoNode(option.next_node_id);
+      optionsContainer.appendChild(button);
+    });
+  }
+</script>
+->
