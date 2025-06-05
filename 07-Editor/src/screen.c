@@ -135,7 +135,7 @@ void update_scroll(int cursorY)
     if (cursorY < state.scroll_offset)
         state.scroll_offset = cursorY;
     else if (cursorY >= state.scroll_offset + MAX_ROWS - 2)
-        state.scroll_offset = cursorY - 20;
+        state.scroll_offset = cursorY - MAX_COLS-4;
 }
 
 void update_cursor_and_state(int cursorX, int cursorY, const TextBuffer *tb)
