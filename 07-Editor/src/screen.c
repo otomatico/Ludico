@@ -73,9 +73,9 @@ void draw_frame(const TextBuffer *tb)
 {
     // Cabecera
     gotoxy(1, 1);
-    printf(GRAY_BG WHITE "%c" DARK_FG, CHAR_TL);
-    draw_char(CHAR_H, MAX_COLS);
-    printf("%c" RESET, CHAR_TR);
+    printf(GRAY_BG WHITE "%c", CHAR_TL);
+    draw_char(CHAR_H, MAX_COLS + 1);
+    printf(DARK_FG "%c" RESET, CHAR_TR);
 
     int title_pos = (MAX_COLS - (int)strlen(tb->filename)) / 2 + 2;
     gotoxy(title_pos, 1);
@@ -85,14 +85,14 @@ void draw_frame(const TextBuffer *tb)
     for (int i = 2; i < MAX_ROWS; ++i)
     {
         gotoxy(1, i);
-        printf(GRAY_BG WHITE "%c" DARK_FG "%*s%c" RESET, CHAR_V, MAX_COLS, "", CHAR_V);
+        printf(GRAY_BG WHITE "%c" DARK_FG " %*s%c" RESET, CHAR_V, MAX_COLS, "", CHAR_V);
     }
 
     // Pie
     gotoxy(1, MAX_ROWS);
-    printf(GRAY_BG WHITE "%c", CHAR_BL);
-    draw_char(CHAR_H, MAX_COLS);
-    printf(DARK_FG "%c" RESET, CHAR_BR);
+    printf(GRAY_BG WHITE "%c" DARK_FG, CHAR_BL);
+    draw_char(CHAR_H, MAX_COLS + 1);
+    printf("%c" RESET, CHAR_BR);
 }
 
 void draw_footer(const TextBuffer *tb, int x, int y)
@@ -133,9 +133,13 @@ void draw_visible_lines(const TextBuffer *tb, int y_offset, int cursorY)
 void update_scroll(int cursorY)
 {
     if (cursorY < state.scroll_offset)
+    {
         state.scroll_offset = cursorY;
+    }
     else if (cursorY >= state.scroll_offset + MAX_ROWS - 2)
-        state.scroll_offset = cursorY - MAX_COLS-4;
+    {
+        state.scroll_offset = cursorY - MAX_ROWS + 3;
+    }
 }
 
 void update_cursor_and_state(int cursorX, int cursorY, const TextBuffer *tb)

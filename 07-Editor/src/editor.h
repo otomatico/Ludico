@@ -5,13 +5,13 @@
 #include <stdbool.h>
 
 #define MAX_LINES 1000
-#define MAX_COLS 120
+#define MAX_COLS 118
 #define MAX_ROWS 24
 #define MAX_LEN_FILENAME 256
 
 typedef struct {
     char filename[MAX_LEN_FILENAME];
-    char lines[MAX_LINES][MAX_COLS];
+    char lines[MAX_LINES][MAX_COLS+2];
     int num_lines;
     bool modified;
 } TextBuffer;

@@ -228,7 +228,7 @@ void edit(TextBuffer *tb)
     int cursor_x = 0, cursor_y = 0;
     first_print_screen(tb, cursor_x, cursor_y);
 
-    while (true)
+    while (1)
     {
         if (_kbhit())
         {
