@@ -1,0 +1,1 @@
+cl65 -o game.nes main.c -t nes --cfg nes.cfg -m game.map

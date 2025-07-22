@@ -1,0 +1,176 @@
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: #f0f2f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
+    color: #333;
+}
+
+.container {
+    background-color: #fff;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    width: 100%;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+h1 {
+    color: #007bff;
+    margin-bottom: 10px;
+    font-size: 2.5em;
+    font-weight: 700;
+}
+
+p {
+    font-size: 1.1em;
+    color: #666;
+    margin-bottom: 30px;
+}
+
+.input-group {
+    text-align: left;
+    margin-bottom: 25px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    border: 1px solid #eee;
+}
+
+.input-group h2 {
+    margin-top: 0;
+    color: #0056b3;
+    font-size: 1.5em;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #555;
+    font-size: 0.95em;
+}
+
+input[type="number"] {
+    width: calc(100% - 20px);
+    padding: 12px 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1em;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+input[type="number"]:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+}
+
+button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 1.2em;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    width: 100%;
+    margin-top: 10px;
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.25);
+}
+
+button:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+}
+
+button:active {
+    background-color: #004085;
+    transform: translateY(0);
+}
+
+.results {
+    margin-top: 35px;
+    padding: 25px;
+    background-color: #e9f7ff;
+    border: 2px solid #cce5ff;
+    border-radius: 12px;
+    text-align: left;
+    display: none; /* Se oculta por defecto y se muestra con JS */
+    opacity: 0;
+    transform: scale(0.95);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.results.show {
+    display: block;
+    opacity: 1;
+    transform: scale(1);
+}
+
+.results h2 {
+    color: #004085;
+    margin-top: 0;
+    font-size: 1.8em;
+    border-bottom: 2px solid #b3d7ff;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+.results p {
+    margin: 10px 0;
+    color: #333;
+    font-size: 1.1em;
+}
+
+.results strong {
+    color: #0056b3;
+}
+
+.results .note {
+    font-size: 0.9em;
+    color: #888;
+    margin-top: 20px;
+    font-style: italic;
+}
+
+.error-message {
+    background-color: #ffebe6;
+    color: #cc0000;
+    border: 1px solid #ff9999;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 20px;
+    display: none; /* Se oculta por defecto y se muestra con JS */
+    font-weight: bold;
+    text-align: center;
+    transition: opacity 0.3s ease;
+}
+
+small {
+    display: block;
+    color: #888;
+    margin-top: -10px;
+    margin-bottom: 15px;
+    font-size: 0.85em;
+    font-style: italic;
+}

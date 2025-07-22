@@ -1,0 +1,24 @@
+#ifndef _CANVAS_4B_H_
+#define _CANVAS_4B_H_
+
+#define colorGraphic(front, back) printf("\e[%d;%d;%dm", front & 0x8 ? 1 : 0, (back & 0x7) + (back & 0x8 ? 100 : 40), (front & 0x7) + 30)
+#define resetColor() printf("\e[0m")
+
+// COLORES
+#define BLACK 0x0
+#define RED 0x1
+#define GREEN 0x2
+#define YELLOW 0x3
+#define BLUE 0x4
+#define MAGENTA 0x5
+#define CYAN 0x6
+#define LIGHTGREY 0x7
+#define DARKGREY 0x8
+#define LIGHTRED 0x9
+#define LIGHTGREEN 0xa
+#define LIGHTYELLOW 0xb
+#define LIGHTBLUE 0xc
+#define LIGHTMAGENTA 0xd
+#define LIGHTCYAN 0xe
+#define WHITE 0xf
+#endif

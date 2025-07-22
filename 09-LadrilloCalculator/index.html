@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Ladrillos</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Calculadora de Ladrillos</h1>
+        <p>Introduce las dimensiones de la pared y del ladrillo para calcular cuántos necesitas.</p>
+        
+        <div class="input-group">
+            <h2>Dimensiones de la Pared</h2>
+            <label for="wall-length">Longitud de la pared (metros):</label>
+            <input type="number" id="wall-length" placeholder="Ej: 5" min="0" step="0.01">
+            
+            <label for="wall-height">Altura de la pared (metros):</label>
+            <input type="number" id="wall-height" placeholder="Ej: 3" min="0" step="0.01">
+        </div>
+
+        <div class="input-group">
+            <h2>Dimensiones del Ladrillo</h2>
+            <label for="brick-length">Longitud del ladrillo (metros):</label>
+            <input type="number" id="brick-length" placeholder="Ej: 0.24" min="0" step="0.001">
+
+            <label for="brick-width">Ancho del ladrillo (metros):</label>
+            <input type="number" id="brick-width" placeholder="Ej: 0.12" min="0" step="0.001">
+
+            <label for="brick-height">Altura del ladrillo (metros):</label>
+            <input type="number" id="brick-height" placeholder="Ej: 0.07" min="0" step="0.001">
+        </div>
+
+        <div class="input-group">
+            <h2>Grosor de la Junta de Mortero</h2>
+            <label for="mortar-thickness">Grosor de la junta (metros):</label>
+            <input type="number" id="mortar-thickness" value="0.01" min="0" step="0.001">
+            <small>Valor recomendado: 0.01m (1cm)</small>
+        </div>
+
+        <button id="calculate-btn">Calcular</button>
+
+        <div class="results" id="results">
+            <h2>Resultados</h2>
+            <p><strong>Área de la pared:</strong> <span id="wall-area">0</span> m²</p>
+            <p><strong>Área de un ladrillo con junta:</strong> <span id="brick-area-with-joint">0</span> m²</p>
+            <p><strong>Ladrillos necesarios:</strong> <span id="required-bricks">0</span></p>
+            <p class="note">Este cálculo es una estimación. Se recomienda añadir un 5-10% adicional por cortes y desperdicios.</p>
+        </div>
+
+        <div class="error-message" id="error-message">
+            Por favor, introduce valores válidos en todos los campos.
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
