@@ -1,0 +1,29 @@
+#ifndef _ENV_H_
+#define _ENV_H_
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define allocateArray(A, B) (A *)malloc(sizeof(A) * ((B > 0) ? (B) : 1))
+#define allocate(A) (A *)malloc(sizeof(A))
+
+#ifndef BYTE
+typedef unsigned char BYTE;
+#endif
+
+#ifndef WORD
+typedef unsigned short WORD;
+#endif
+
+#define SCREEN_WIDTH 40
+#define SCREEN_HEIGHT 20
+
+#define MARGIN_X 2
+#define MARGIN_Y 2
+
+#define MAX_ENTITIES 128
+#define MAX_BODY_SNAKE 40
+
+// #define LINUX       // Si quieres compilar en linux, por defecto es para windows
+#endif
