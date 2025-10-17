@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+/*
 #define allocateArray(A, B) (A *)malloc(sizeof(A) * ((B > 0) ? (B) : 1))
 #define allocate(A) (A *)malloc(sizeof(A))
 
@@ -15,7 +15,7 @@ typedef unsigned char BYTE;
 #ifndef WORD
 typedef unsigned short WORD;
 #endif
-
+*/
 #define SCREEN_WIDTH 40
 #define SCREEN_HEIGHT 20
 
@@ -23,7 +23,7 @@ typedef unsigned short WORD;
 #define MARGIN_Y 2
 
 #define MAX_ENTITIES 128
-#define MAX_BODY_SNAKE 40
+#define MAX_BODY_SNAKE 20
 
 // #define LINUX       // Si quieres compilar en linux, por defecto es para windows
 #endif

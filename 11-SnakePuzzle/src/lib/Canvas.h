@@ -10,6 +10,15 @@
 #define allocate(A) (A *)malloc(sizeof(A))
 #define allocateArray(A, B) (A *)malloc(sizeof(A) * ((B > 0) ? (B) : 1))
 #endif
+
+#ifndef BYTE
+typedef unsigned char BYTE;
+#endif
+
+#ifndef WORD
+typedef unsigned short WORD;
+#endif
+
 typedef struct
 {
     BYTE color; // foreground (4 bits altos) | background (4 bits bajos)

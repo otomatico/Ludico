@@ -1,10 +1,12 @@
-/*⚡ env*/
-#ifndef _ENV_H_
-#define _ENV_H_
+// gcc -o snake.exe main.c
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+/*⚡ env*/
+#ifndef _ENV_H_
+#define _ENV_H_
 
 #define allocateArray(A, B) (A *)malloc(sizeof(A) * ((B > 0) ? (B) : 1))
 #define allocate(A) (A *)malloc(sizeof(A))
@@ -119,10 +121,6 @@ int press()
 #ifndef _CANVAS_H_
 #define _CANVAS_H_
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 typedef struct
 {
     BYTE color; // foreground (4 bits altos) | background (4 bits bajos)
@@ -165,10 +163,6 @@ static inline void Canvas_Destroy(Canvas *c)
 /*🎨 graphic.h*/
 #ifndef _GRAPHIC_H_
 #define _GRAPHIC_H_
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 
 #define colorGraphic(front, back) printf("\e[%d;%d;%dm", (front & 0x8 ? 1 : 0), ((back & 0x7) + (back & 0x8 ? 100 : 40)), ((front & 0x7) + 30))
 #define resetColor() printf("\e[0m")
@@ -630,7 +624,7 @@ void SystemMovement(World_ECS *w, int width, int height)
             s->body[0].x += e->vel.dx;
             s->body[0].y += e->vel.dy;
 
-            // Wrap
+            // Wrap - Atrevesar Paredes ..
             if (s->body[0].x < 0)
                 s->body[0].x = width - 1;
             if (s->body[0].x >= width)
@@ -715,7 +709,6 @@ void SystemRender(World_ECS *w, Graphic gfx, Canvas *canvas)
 #endif
 
 /*🧠 main.c*/
-#include <stdlib.h>
 #include <time.h>
 
 int main()
@@ -737,7 +730,7 @@ int main()
     int snakeId = World_CreateEntity(&world, snake);
 
     // Crear comida
-    Entity_ECS *food = CreateFood(rand() % SCREEN_WIDTH, rand() % SCREEN_HEIGHT);
+    Entity_ECS *food = CreateFood(rand() % ( SCREEN_WIDTH-2) +1, rand() % (SCREEN_HEIGHT-2)+1);
     World_CreateEntity(&world, food);
 
     int score = 0;
