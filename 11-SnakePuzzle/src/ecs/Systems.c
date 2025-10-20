@@ -8,153 +8,176 @@
 #include "Entities.h"
 #include "Components.c"
 
-// Entrada para la serpiente
-void SystemInput(World_ECS *w, int snakeId)
+void InputSystem(World_ECS *w, int key)
 {
-    int key = press();
-    if (key == KEY_EMPTY)
-        return;
-
-    Entity_ECS *snake = w->entities[snakeId];
-    if (!snake->vel.activo)
-        return;
-
-    switch (key)
+    int snakeId = 0;
+    while (snakeId < w->count && (&(w->entities[snakeId])->type) != ENTITY_SNAKE)
     {
-    case KEY_UP:
-        if (snake->vel.dy == 0)
+        snakeId++;
+    };
+
+    if (snakeId < w->count)
+    {
+        Entity_ECS *e = &w->entities[snakeId];
+        SnakeData *sd = (SnakeData *)e->data;
+        PointData *head = &sd->body[0];
+
+        switch (key)
         {
-            snake->vel.dx = 0;
-            snake->vel.dy = -1;
+        case KEY_LEFT:
+            e->vel.dx = -1;
+            break;
+        case KEY_RIGHT:
+            e->vel.dx = 1;
+            break;
+        case KEY_UP:
+            e->vel.dy = -1;
+            break;
         }
-        break;
-    case KEY_DOWN:
-        if (snake->vel.dy == 0)
-        {
-            snake->vel.dx = 0;
-            snake->vel.dy = 1;
-        }
-        break;
-    case KEY_LEFT:
-        if (snake->vel.dx == 0)
-        {
-            snake->vel.dx = -1;
-            snake->vel.dy = 0;
-        }
-        break;
-    case KEY_RIGHT:
-        if (snake->vel.dx == 0)
-        {
-            snake->vel.dx = 1;
-            snake->vel.dy = 0;
-        }
-        break;
-    default:
-        break;
     }
 }
 
-// Movimiento
-void SystemMovement(World_ECS *w, int width, int height)
+void PhysicsSystem(World_ECS *w)
 {
-    for (int i = 0; i < MAX_ENTITIES; i++)
+    for (int i = 0; i < w->count; i++)
     {
-        Entity_ECS *e = w->entities[i];
-        if (!e || !e->activo || !e->vel.activo)
+        Entity_ECS *e = &w->entities[i];
+        if (!e || !e->activo)
+            continue;
+        if (e->type == ENTITY_SNAKE)
+        {
+            SnakeData *s = (SnakeData *)e->data;
+            // Verificar si alguna parte está apoyada
+            int supported = 0;
+            for (int j = 0; j < s->length; j++)
+            {
+                if (IsSolidAt(w, s->body[j].x, s->body[j].y + 1, e))
+                {
+                    supported = 1;
+                    break;
+                }
+            }
+            // Determinar caída: solo si ninguna parte tiene apoyo
+            int fall = supported ? 0 : 1;
+
+            // Mover cola siguiendo la cabeza
+            if (e->vel.dx || e->vel.dy || fall)
+            {
+                for (int j = s->length; j > 0; j--)
+                {
+                    if (!supported)
+                    {
+                        s->body[j].y += 1; // toda la serpiente cae
+                    }
+                    else
+                    {
+                        s->body[j].x = s->body[j - 1].x;
+                        s->body[j].y = s->body[j - 1].y;
+                    }
+                }
+
+                // Mover cabeza
+                s->body[0].x += e->vel.dx;
+                s->body[0].y += fall ? fall : e->vel.dy;
+            }
+
+            // Reset de velocidades temporales
+            e->vel.dx = 0;
+            e->vel.dy = 0;
+        }
+    }
+}
+
+int CollisionSystem(World_ECS *w)
+{
+    for (int i = 0; i < w->count; i++)
+    {
+        Entity_ECS *e = &w->entities[i];
+        if (e->type != ENTITY_SNAKE || !e->activo)
+            continue;
+
+        SnakeData *sd = (SnakeData *)e->data;
+        PointData *head = &sd->body[0];
+
+        // 1. Caída al vacío
+        if (head->y > SCREEN_HEIGHT)
+        {
+            cleaner();
+            printf("💀 Has caído al vacío...");
+            return 0;
+        }
+
+        // 2. Comer comida /Portal
+        for (int j = 0; j < w->count; j++)
+        {
+            Entity_ECS *f = &w->entities[j];
+            if (f->activo)
+            {
+                if (f->type == ENTITY_FOOD)
+                {
+                    PointData *p = (PointData *)f->data;
+                    if (p->x == head->x && p->y == head->y)
+                    {
+                        f->activo = 0;
+                        if (sd->length < MAX_BODY_SNAKE)
+                        {
+                            sd->length++; // añadir segmento
+                        }
+                    }
+                }
+
+                // Colisión con salida/portal
+                if (f->type == ENTITY_EXIT)
+                {
+                    PointData *p = (PointData *)f->data;
+                    if (p->x == head->x && p->y == head->y)
+                    {
+                        gotoXY(1, SCREEN_HEIGHT + 3);
+                        printf("- Has alcanzado la salida, cargando nuevo mapa...");
+                        // Llamamos a la función de cargar mapa
+                        InitWorld(w); // reinicia mundo, se puede mejorar para distintos niveles
+                        return 1;
+                    }
+                }
+            }
+        }
+    }
+}
+
+void RenderSystem(World_ECS *w, Graphic *gfx, Canvas *c)
+{
+    gfx->Clear(c, BLACK);
+
+    for (int i = 0; i < w->count; i++)
+    {
+        Entity_ECS *e = &w->entities[i];
+        if (!e->activo)
             continue;
 
         if (e->type == ENTITY_SNAKE)
         {
-            SnakeData *s = (SnakeData *)e->data;
-            // Mover cuerpo
-            for (int j = s->length - 1; j > 0; j--)
+            SnakeData *sd = (SnakeData *)e->data;
+            for (int j = 0; j < sd->length; j++)
             {
-                s->body[j].x = s->body[j - 1].x;
-                s->body[j].y = s->body[j - 1].y;
+                gfx->SetPixel(c, sd->body[j].x, sd->body[j].y, GREEN);
             }
-            s->body[0].x += e->vel.dx;
-            s->body[0].y += e->vel.dy;
-
-            // Wrap
-            if (s->body[0].x < 0)
-                s->body[0].x = width - 1;
-            if (s->body[0].x >= width)
-                s->body[0].x = 0;
-            if (s->body[0].y < 0)
-                s->body[0].y = height - 1;
-            if (s->body[0].y >= height)
-                s->body[0].y = 0;
         }
-    }
-}
-
-// Colisión
-int SystemCollision(World_ECS *w, int snakeId)
-{
-    Entity_ECS *snake = w->entities[snakeId];
-    if (SnakeFoodCollision(w, snakeId))
-    {
-        Entity_ECS *newFood = CreateFood(rand() % (SCREEN_WIDTH - 2) + 1, rand() % (SCREEN_HEIGHT - 2) + 1);
-        World_CreateEntity(w, newFood);
-
-        SnakeData *sdata = (SnakeData *)snake->data;
-        // Para evitar posicion fantasma en [0,0]
-        sdata->body[sdata->length].x = sdata->body[sdata->length - 1].x;
-        sdata->body[sdata->length].y = sdata->body[sdata->length - 1].y;
-        sdata->length++; // crecer
-    }
-    // Colisión consigo misma
-    if (SnakeSelfCollision(snake))
-    {
-        printf("\nHas chocado contigo mismo!\n");
-        return 0;
-    }
-
-    // Colisión con paredes
-    if (SnakeWallCollision(w, snake))
-    {
-        printf("\nHas chocado con una pared!\n");
-        return 0;
-    }
-    return 1;
-}
-
-// Renderizado
-void SystemRender(World_ECS *w, Graphic gfx, Canvas *canvas)
-{
-    gfx.Clear(canvas, BLACK);
-
-    for (int i = 0; i < MAX_ENTITIES; i++)
-    {
-        Entity_ECS *e = w->entities[i];
-        if (!e || !e->activo)
-            continue;
-
-        switch (e->type)
+        else
         {
-        case ENTITY_SNAKE:
-        {
-            SnakeData *s = (SnakeData *)e->data;
-            gfx.SetPixel(canvas, s->body[0].x, s->body[0].y, LIGHTGREEN);
-            for (int j = 1; j < s->length; j++)
-                gfx.SetPixel(canvas, s->body[j].x, s->body[j].y, GREEN);
-            break;
-        }
-        case ENTITY_FOOD:
-        {
-            PointData *f = (PointData *)e->data;
-            gfx.SetPixel(canvas, f->x, f->y, LIGHTRED);
-            break;
-        }
-        case ENTITY_WALL:
-        {
-            PointData *wdata = (PointData *)e->data;
-            gfx.SetPixel(canvas, wdata->x, wdata->y, YELLOW);
-            break;
-        }
+            PointData *p = (PointData *)e->data;
+            BYTE color = WHITE;
+            if (e->type == ENTITY_WALL)
+                color = LIGHTGREY;
+            if (e->type == ENTITY_FOOD)
+                color = LIGHTRED;
+            if (e->type == ENTITY_PLATFORM)
+                color = YELLOW;
+            if (e->type == ENTITY_EXIT)
+                color = CYAN;
+            gfx->SetPixel(c, p->x, p->y, color);
         }
     }
 
-    gfx.Draw(canvas, MARGIN_X, MARGIN_Y);
+    gfx->Draw(c, 2, 2);
 }
 #endif

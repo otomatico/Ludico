@@ -5,10 +5,10 @@
 #include <unistd.h> // usleep()
 #include "../src/lib/Engine2D.h"
 
-#define WIDTH 40
-#define HEIGHT 20
+#define SCREEN_WIDTH 40
+#define SCREEN_HEIGHT 20
 #define GRAVITY 1
-#define GROUND_Y (HEIGHT - 2)
+#define GROUND_Y (SCREEN_HEIGHT - 2)
 #define MAX_ENTITIES 128
 #define MAX_BODY_SNAKE 10
 
@@ -136,7 +136,7 @@ void InitWorld(World_ECS *w)
     w->entities[w->entityCount++] = CreateEntity(ENTITY_SNAKE, 8, GROUND_Y - 1);
 
     // Piso
-    for (int i = 5; i < WIDTH - 5; i++)
+    for (int i = 5; i < SCREEN_WIDTH - 5; i++)
         w->entities[w->entityCount++] = CreateEntity(ENTITY_WALL, i, GROUND_Y);
 
     // Plataforma central
@@ -248,7 +248,7 @@ void CollisionSystem(World_ECS *w)
         PointData *head = &sd->body[0];
 
         // 1. Caída al vacío
-        if (head->y > HEIGHT)
+        if (head->y > SCREEN_HEIGHT)
         {
             cleaner();
             printf("\n💀 Has caído al vacío...\n");
@@ -281,7 +281,7 @@ void CollisionSystem(World_ECS *w)
                     PointData *p = (PointData *)f->data;
                     if (p->x == head->x && p->y == head->y)
                     {
-                        gotoXY(1, HEIGHT+3);
+                        gotoXY(1, SCREEN_HEIGHT + 3);
                         printf("- Has alcanzado la salida, cargando nuevo mapa...");
                         // Llamamos a la función de cargar mapa
                         InitWorld(w); // reinicia mundo, se puede mejorar para distintos niveles
@@ -335,7 +335,7 @@ void RenderSystem(World_ECS *w, Graphic *gfx, Canvas *c)
 //------------------------------------------------------------
 int main()
 {
-    Canvas *canvas = Canvas_Create(WIDTH, HEIGHT);
+    Canvas *canvas = Canvas_Create(SCREEN_WIDTH, SCREEN_HEIGHT);
     Graphic gfx = Graphic_Init();
 
     World_ECS world;

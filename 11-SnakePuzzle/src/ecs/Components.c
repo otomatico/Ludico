@@ -60,7 +60,7 @@ Entity_ECS *CreateWall(int x, int y)
     return e;
 }
 
-// Square Wall
+/* Square Wall
 void CreateBorderWalls(World_ECS *world, int width, int height)
 {
     // Bordes superior e inferior
@@ -83,6 +83,7 @@ void CreateBorderWalls(World_ECS *world, int width, int height)
         World_CreateEntity(world, right);
     }
 }
+*/
 
 // Colisión snake-self
 int SnakeSelfCollision(Entity_ECS *snake)
@@ -134,9 +135,8 @@ int SnakeWallCollision(World_ECS *w, Entity_ECS *snake)
 }
 
 // Colisión snake-food
-int SnakeFoodCollision(World_ECS *w, int snakeId)
+int SnakeFoodCollision(World_ECS *w, Entity_ECS *snake)
 {
-    Entity_ECS *snake = w->entities[snakeId];
     SnakeData *s = (SnakeData *)snake->data;
     int eaten = 0;
 
@@ -160,4 +160,33 @@ int SnakeFoodCollision(World_ECS *w, int snakeId)
     return eaten;
 }
 
+int IsSolidAt(World_ECS *w, int x, int y, Entity_ECS *ignore)
+{
+    for (int i = 0; i < w->count; i++)
+    {
+        Entity_ECS *e = &w->entities[i];
+        if (!e->activo || e == ignore)
+            continue;
+
+        if (e->type == ENTITY_WALL || e->type == ENTITY_PLATFORM)
+        {
+            PointData *p = (PointData *)e->data;
+            if (p->x == x && p->y == y)
+                return 1;
+            continue;
+        }
+        if (e->type == ENTITY_SNAKE)
+        {
+            SnakeData *sd = (SnakeData *)e->data;
+            for (int j = 0; j < sd->length; j++)
+            {
+                if (sd->body[j].x == x && sd->body[j].y == y)
+                {
+                    return 1;
+                }
+            }
+        }
+    }
+    return 0;
+}
 #endif

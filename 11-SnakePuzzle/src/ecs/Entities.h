@@ -6,9 +6,12 @@
 
 typedef enum
 {
+    ENTITY_NONE,
     ENTITY_SNAKE, // 🐍 Snake
     ENTITY_FOOD,  // 🍎 Food
-    ENTITY_WALL   // 🧱 Wall
+    ENTITY_WALL,  // 🧱 Wall
+    ENTITY_PLATFORM,
+    ENTITY_EXIT
 } TypeEntity;
 
 typedef struct
@@ -34,6 +37,7 @@ typedef struct
     TypeEntity type;
     void *data;   // apunta a la estructura concreta
     Velocity vel; // opcional
+    int gravityEnabled;
 } Entity_ECS;
 
 typedef struct
