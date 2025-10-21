@@ -7,11 +7,12 @@
 typedef enum
 {
     ENTITY_NONE,
-    ENTITY_SNAKE, // 🐍 Snake
-    ENTITY_FOOD,  // 🍎 Food
-    ENTITY_WALL,  // 🧱 Wall
-    ENTITY_PLATFORM,
-    ENTITY_EXIT
+    ENTITY_SNAKE,       // 🐍 Snake
+    ENTITY_FOOD,        // 🍎 Food
+    ENTITY_PLATFORM,    // 🧱 Wall
+    ENTITY_ROCK,        // 🪨 Rock
+    ENTITY_SPIKE,       // 🔱 Spike
+    ENTITY_EXIT         // 🚪 Door
 } TypeEntity;
 
 typedef struct
@@ -19,10 +20,16 @@ typedef struct
     int x, y;
 } PointData;
 
+int EqualPoint(PointData *a, PointData *b)
+{
+    return a->x == b->x && a->y == b->y;
+}
+
 typedef struct
 {
-    PointData body[MAX_BODY_SNAKE];
     int length;
+    int gravityEnabled;
+    PointData body[MAX_BODY_SNAKE];
 } SnakeData;
 
 typedef struct
@@ -33,47 +40,18 @@ typedef struct
 
 typedef struct
 {
-    int activo;
+    int active;
     TypeEntity type;
+    Velocity vel; // opcionalmente obligatoria
     void *data;   // apunta a la estructura concreta
-    Velocity vel; // opcional
-    int gravityEnabled;
 } Entity_ECS;
 
 typedef struct
 {
-    Entity_ECS *entities[MAX_ENTITIES]; // OJO Array de punteros
+    int id;
     int count;
+    Entity_ECS *player; // Extrair Jugador .. reduz complejidad
+    Entity_ECS *entities[MAX_ENTITIES]; // OJO Array de punteros
 } World_ECS;
 
-static inline void World_Init(World_ECS *w)
-{
-    for (int i = 0; i < MAX_ENTITIES; i++)
-        w->entities[i] = NULL;
-    w->count = 0;
-}
-
-// Crear nueva entidad y devolver índice
-static inline int World_CreateEntity(World_ECS *w, Entity_ECS *e)
-{
-    for (int i = 0; i < MAX_ENTITIES; i++)
-    {
-        if (w->entities[i] == NULL)
-        {
-            w->entities[i] = e;
-            w->count++;
-            return i;
-        }
-    }
-    return -1; // no hay espacio
-}
-
-// Destruir entidad
-void DestroyEntity(Entity_ECS *e)
-{
-    if (!e)
-        return;
-    free(e->data);
-    free(e);
-}
 #endif

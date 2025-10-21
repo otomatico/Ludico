@@ -8,10 +8,15 @@
 
 #define SCREEN_WIDTH 40
 #define SCREEN_HEIGHT 20
-#define GRAVITY 1
+#define MARGIN_X 2
+#define MARGIN_Y 2
 #define GROUND_Y (SCREEN_HEIGHT - 2)
-#define MAX_ENTITIES 128
-#define MAX_BODY_SNAKE 10
+
+#define GRAVITY 1
+#define MAX_ENTITIES 64
+#define MAX_BODY_SNAKE 8
+
+
 
 // #define LINUX       // Si quieres compilar en linux, por defecto es para windows
 
