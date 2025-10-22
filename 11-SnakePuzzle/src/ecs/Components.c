@@ -4,16 +4,7 @@
 
 #include "Entities.h"
 
-typedef struct
-{
-    void (*Initialize)(World_ECS *);
-    int (*CreateEntity)(World_ECS *, TypeEntity, int, int);
-    TypeEntity (*Collide)(World_ECS *, PointData *);
-    void (*EnabledEntity)(World_ECS *, PointData *, int);
-    void (*MovimentPlayer)(Entity_ECS *, int);
-    void (*Destroy)(World_ECS *);
-} Component;
-
+//# World
 // Inicializar el "MUNDO"
 static inline void World_Init(World_ECS *w)
 {
@@ -103,23 +94,7 @@ static inline void World_Destroy(World_ECS *w)
         DestroyByEntity(w->entities[i]);
         w->entities[i] = NULL;
     }
-}
-
-// Colisión snake-tail
-inline TypeEntity SnakeSelfCollision(Entity_ECS *player, PointData *position)
-{
-    SnakeData *sd = (SnakeData *)player->data;
-    PointData *tail = NULL;
-    // Recorremos el cuerpo a partir del segundo segmento
-    for (int index = 0; index < sd->length; index++)
-    {
-        tail = &sd->body[index];
-        if (EqualPoint(tail, position))
-        {
-            return ENTITY_SNAKE;
-        }
-    }
-    return ENTITY_NONE;
+    DestroyByEntity(w->player);
 }
 
 static inline TypeEntity PointCollision(World_ECS *w, PointData *position)
@@ -136,9 +111,34 @@ static inline TypeEntity PointCollision(World_ECS *w, PointData *position)
             return e->type;
         }
     }
-    return ENTITY_NONE; // SnakeSelfCollision(w->player, position);
+    return ENTITY_NONE;
 }
 
+
+//# Player
+//Inicializar Player
+static inline void Player_Init(Entity_ECS * e, int x, int y){
+    e = CreateEntity(ENTITY_SNAKE, x, y);
+}
+
+// Colisión snake-tail
+static inline TypeEntity SnakeSelfCollision(Entity_ECS *player, PointData *position)
+{
+    SnakeData *sd = (SnakeData *)player->data;
+    PointData *tail = NULL;
+    // Recorremos el cuerpo a partir del segundo segmento
+    for (int index = 0; index < sd->length; index++)
+    {
+        tail = &sd->body[index];
+        if (EqualPoint(tail, position))
+        {
+            return ENTITY_SNAKE;
+        }
+    }
+    return ENTITY_NONE;
+}
+
+//Move Player
 static inline void PlayerMoviment(Entity_ECS *player, int supported)
 {
     SnakeData *snake = (SnakeData *)player->data;
@@ -168,16 +168,44 @@ static inline void PlayerMoviment(Entity_ECS *player, int supported)
     //player->vel.dy = 0;
 }
 
-static Component Component_Init(void)
+typedef struct
 {
-    Component world;
+    void (*Initialize)(World_ECS *);
+    int (*CreateEntity)(World_ECS *, TypeEntity, int, int);
+    TypeEntity (*Collide)(World_ECS *, PointData *);
+    void (*EnabledEntity)(World_ECS *, PointData *, int);
+    void (*Destroy)(World_ECS *);
+} ComponentWorld;
+
+typedef struct
+{
+    void (*Initialize)(Entity_ECS *, int x, int y);
+    void (*Moviment)(Entity_ECS *, int);
+    TypeEntity (*CollideSelf)(Entity_ECS *player, PointData *position);
+    void (*Destroy)(Entity_ECS *);
+} ComponentPlayer;
+
+static ComponentWorld ComponentWorld_Init(void)
+{
+    ComponentWorld world;
+
     world.Initialize = World_Init;
     world.CreateEntity = World_CreateEntity;
     world.EnabledEntity = World_EnabledEntityByPoint;
     world.Destroy = World_Destroy;
     world.Collide = PointCollision;
-    world.MovimentPlayer = PlayerMoviment;
     return world;
 }
-// Component WorldComponent = Component_Init();
+
+static ComponentPlayer ComponentPlayer_Init(void)
+{
+    ComponentPlayer player;
+
+    player.Initialize = Player_Init;
+    player.Moviment = PlayerMoviment;
+    player.CollideSelf = SnakeSelfCollision;
+    player.Destroy=DestroyByEntity;
+    return player;
+}
+
 #endif

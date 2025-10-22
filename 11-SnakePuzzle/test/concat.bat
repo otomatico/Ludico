@@ -1,6 +1,6 @@
 @echo off
 setlocal enabledelayedexpansion
-
+:: dir /S /B>project.dir
 :: Directorio principal donde se encuentra el script
 set "ROOT_DIR=%~dp0"
 :: Crear la carpeta de salida si no existe
