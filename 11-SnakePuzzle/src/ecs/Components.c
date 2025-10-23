@@ -2,10 +2,44 @@
 #ifndef _COMPONENTS_C_
 #define _COMPONENTS_C_
 
-#include "Entities.h"
+// #include "Entities.h"
+#include "MapEntity.h"
+// Componentes
+typedef struct _Component Component;
 
-//# World
-// Inicializar el "MUNDO"
+typedef struct
+{
+    void (*Initialize)(World_ECS *);
+    int (*CreateEntity)(World_ECS *, TypeEntity, int, int);
+    TypeEntity (*Collide)(World_ECS *, PointData *);
+    void (*EnabledEntity)(World_ECS *, PointData *, int);
+    void (*Destroy)(World_ECS *);
+} ComponentWorld;
+
+typedef struct
+{
+    void (*Initialize)(Entity_ECS *, int x, int y);
+    void (*Moviment)(Entity_ECS *, int);
+    TypeEntity (*CollideSelf)(Entity_ECS *player, PointData *position);
+    void (*Destroy)(Entity_ECS *);
+} ComponentPlayer;
+
+typedef struct
+{
+    // void (*Initialize)(MapEntity **);
+    void (*Load)(World_ECS *, MapEntity **, Component *, int level);
+    // void (*Destroy)(MapEntity **);
+} ComponentMap;
+
+typedef struct _Component
+{
+    ComponentWorld world;
+    ComponentPlayer player;
+    ComponentMap map;
+} Component;
+
+// # World
+//  Inicializar el "MUNDO"
 static inline void World_Init(World_ECS *w)
 {
     for (int i = 0; i < MAX_ENTITIES; i++)
@@ -114,10 +148,10 @@ static inline TypeEntity PointCollision(World_ECS *w, PointData *position)
     return ENTITY_NONE;
 }
 
-
-//# Player
-//Inicializar Player
-static inline void Player_Init(Entity_ECS * e, int x, int y){
+// # Player
+// Inicializar Player
+static inline void Player_Init(Entity_ECS *e, int x, int y)
+{
     e = CreateEntity(ENTITY_SNAKE, x, y);
 }
 
@@ -138,7 +172,7 @@ static inline TypeEntity SnakeSelfCollision(Entity_ECS *player, PointData *posit
     return ENTITY_NONE;
 }
 
-//Move Player
+// Move Player
 static inline void PlayerMoviment(Entity_ECS *player, int supported)
 {
     SnakeData *snake = (SnakeData *)player->data;
@@ -164,28 +198,39 @@ static inline void PlayerMoviment(Entity_ECS *player, int supported)
     }
 
     // Reset de velocidades temporales
-    //player->vel.dx = 0;
-    //player->vel.dy = 0;
+    // player->vel.dx = 0;
+    // player->vel.dy = 0;
 }
 
-typedef struct
+// # Map
+void MapLoad(World_ECS *w, MapEntity **Tile, Component *c, int level)
 {
-    void (*Initialize)(World_ECS *);
-    int (*CreateEntity)(World_ECS *, TypeEntity, int, int);
-    TypeEntity (*Collide)(World_ECS *, PointData *);
-    void (*EnabledEntity)(World_ECS *, PointData *, int);
-    void (*Destroy)(World_ECS *);
-} ComponentWorld;
+    MapEntity *Map = Tile[level];
+    for (int index = 0; index < Map->lenght; index++)
+    {
+        EntityDraw *line = &(Map->tiles[index]);
+        switch (line->draw)
+        {
+        case APOINT:
+            c->world.CreateEntity(w, line->entity, line->x, line->y);
+            break;
+        case LINE_HORIZONTAL:
+            for (int x = 0; x < line->lenght; x++)
+            {
+                c->world.CreateEntity(w, line->entity, line->x + x, line->y);
+            }
+            break;
+        case LINE_VERTICAL:
+            for (int y = 0; y < line->lenght; y++)
+            {
+                c->world.CreateEntity(w, line->entity, line->x, line->y + y);
+            }
+            break;
+        }
+    }
+}
 
-typedef struct
-{
-    void (*Initialize)(Entity_ECS *, int x, int y);
-    void (*Moviment)(Entity_ECS *, int);
-    TypeEntity (*CollideSelf)(Entity_ECS *player, PointData *position);
-    void (*Destroy)(Entity_ECS *);
-} ComponentPlayer;
-
-static ComponentWorld ComponentWorld_Init(void)
+ComponentWorld ComponentWorld_Init(void)
 {
     ComponentWorld world;
 
@@ -197,15 +242,32 @@ static ComponentWorld ComponentWorld_Init(void)
     return world;
 }
 
-static ComponentPlayer ComponentPlayer_Init(void)
+ComponentPlayer ComponentPlayer_Init(void)
 {
     ComponentPlayer player;
 
     player.Initialize = Player_Init;
     player.Moviment = PlayerMoviment;
     player.CollideSelf = SnakeSelfCollision;
-    player.Destroy=DestroyByEntity;
+    player.Destroy = DestroyByEntity;
     return player;
+}
+
+ComponentMap ComponentMap_Init(void)
+{
+    ComponentMap m;
+    m.Load = MapLoad;
+    // player.Destroy = DestroyByEntity;
+    return m;
+}
+
+Component Component_Init(void)
+{
+    Component c;
+    c.world = ComponentWorld_Init();
+    c.player = ComponentPlayer_Init();
+    c.map = ComponentMap_Init();
+    return c;
 }
 
 #endif

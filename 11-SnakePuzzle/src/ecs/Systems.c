@@ -6,37 +6,8 @@
 #include "../lib/Engine2D.h"
 #include "Components.c"
 
-void MapSystem(World_ECS *w, ComponentWorld *rules, int level)
-{
-    rules->Destroy(w);
-    rules->Initialize(w);
-    w->id = level;
-    MapEntity *Map = Tiles[level % 2];
-    for (int index = 0; index < Map->lenght; index++)
-    {
-        EntityDraw *line = &(Map->tiles[index]);
-        switch (line->draw)
-        {
-        case APOINT:
-            rules->CreateEntity(w, line->entity, line->x, line->y);
-            break;
-        case LINE_HORIZONTAL:
-            for (int x = 0; x < line->lenght; x++)
-            {
-                rules->CreateEntity(w, line->entity, line->x + x, line->y);
-            }
-            break;
-        case LINE_VERTICAL:
-            for (int y = 0; y < line->lenght; y++)
-            {
-                rules->CreateEntity(w, line->entity, line->x, line->y + y);
-            }
-            break;
-        }
-    }
-}
 
-void InputSystem(Entity_ECS *player, int key)
+static inline void InputSystem(Entity_ECS *player, int key)
 {
     switch (key)
     {
@@ -55,7 +26,7 @@ void InputSystem(Entity_ECS *player, int key)
     }
 }
 
-inline void PhysicsSystem(World_ECS *w, ComponentWorld *rules, ComponentPlayer *play)
+static inline void PhysicsSystem(World_ECS *w, Component *c)
 {
     Entity_ECS *player = w->player;
     SnakeData *snake = (SnakeData *)player->data;
@@ -67,7 +38,7 @@ inline void PhysicsSystem(World_ECS *w, ComponentWorld *rules, ComponentPlayer *
     {
         position.x = snake->body[index].x;
         position.y = snake->body[index].y + 1;
-        if (rules->Collide(w, &position) != ENTITY_NONE)
+        if (c->world.Collide(w, &position) != ENTITY_NONE)
         {
             supported = 1;
         }
@@ -75,23 +46,23 @@ inline void PhysicsSystem(World_ECS *w, ComponentWorld *rules, ComponentPlayer *
 
     PointData head = (PointData){snake->body[0].x + player->vel.dx, snake->body[0].y + player->vel.dy};
     // Evite subir sobre si mismo o traspasar paredes
-    TypeEntity entity = rules->Collide(w, &head);
+    TypeEntity entity = c->world.Collide(w, &head);
     // Si la posicion esta Ocupada
-    if (play->CollideSelf(player, &head) == ENTITY_SNAKE)
+    if (c->player.CollideSelf(player, &head) == ENTITY_SNAKE)
     {
         player->vel.dx = 0;
         player->vel.dy = 0;
     }
     if (entity != ENTITY_PLATFORM && entity != ENTITY_ROCK)
     {
-        play->Moviment(player, supported);
+        c->player.Moviment(player, supported);
     }
     // Reset de velocidades temporales
     player->vel.dx = 0;
     player->vel.dy = 0;
 }
 
-inline int CollisionSystem(World_ECS *w, ComponentWorld *rules)
+static inline int CollisionSystem(World_ECS *w, Component *c)
 {
     SnakeData *snake = (SnakeData *)w->player->data;
     PointData *head = &snake->body[0];
@@ -101,21 +72,24 @@ inline int CollisionSystem(World_ECS *w, ComponentWorld *rules)
     {
         return 0;
     }
-    TypeEntity hit = rules->Collide(w, head);
+    TypeEntity hit = c->world.Collide(w, head);
     switch (hit)
     {
     case ENTITY_EXIT:
-        MapSystem(w, rules, w->id + 1);
+        c->world.Destroy(w);
+        c->world.Initialize(w);
+        w->id++;
+        c->map.Load(w, Tiles, c, w->id);
         break;
     case ENTITY_FOOD:
-        rules->EnabledEntity(w, head, 0);
+        c->world.EnabledEntity(w, head, 0);
         snake->length++;
         break;
     }
     return 1;
 }
 
-void RenderSystem(World_ECS *w, Graphic *gfx, Canvas *c)
+static inline void RenderSystem(World_ECS *w, Graphic *gfx, Canvas *c)
 {
     gfx->Clear(c, DARKGREY);
     for (int index = 0; index < w->count; index++)
@@ -149,7 +123,7 @@ void RenderSystem(World_ECS *w, Graphic *gfx, Canvas *c)
 
     gfx->Draw(c, MARGIN_X, MARGIN_Y);
     gotoXY(SCREEN_WIDTH + MARGIN_X + 1, MARGIN_Y);
-    printf("Level %d", w->id);
+    printf("Level %d", w->id+1);
     resetColor();
 }
 
@@ -157,22 +131,19 @@ typedef struct
 {
     void (*WatchGamePad)(Entity_ECS *, int);
 
-    void (*Physics)(World_ECS *, ComponentWorld *, ComponentPlayer *);
-    int (*Collide)(World_ECS *, ComponentWorld *);
-
-    void (*MapLoad)(World_ECS *, ComponentWorld *, int);
+    void (*Physics)(World_ECS *, Component *);
+    int (*Collide)(World_ECS *, Component *);
     void (*Render)(World_ECS *, Graphic *, Canvas *);
     // void (*Destroy)(World_ECS *);
     // void (*Destroy)(Component *);
 } System;
 
-static System System_Init(void)
+System System_Init(void)
 {
     System sys;
     sys.WatchGamePad = InputSystem;
     sys.Physics = PhysicsSystem;
     sys.Collide = CollisionSystem;
-    sys.MapLoad = MapSystem;
     sys.Render = RenderSystem;
     return sys;
 }

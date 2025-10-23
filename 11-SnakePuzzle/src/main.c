@@ -10,13 +10,12 @@ int main()
     Graphic gfx = Graphic_Init();
 
     World_ECS world;
-    ComponentWorld worldRules = ComponentWorld_Init();
-    ComponentPlayer playerRules = ComponentPlayer_Init();
+    Component rules = Component_Init();
     System system = System_Init();
 
-    worldRules.Initialize(&world);
-    playerRules.Initialize(world.player,0,0);
-    system.MapLoad(&world, &worldRules, 0);
+    rules.world.Initialize(&world);
+    rules.player.Initialize(world.player,0,0);
+    rules.map.Load(&world, Tiles, &rules, 0);
     hidecursor();
     cleaner();
 
@@ -25,8 +24,8 @@ int main()
     {
         int key = press();
         system.WatchGamePad(world.player, key);
-        running = system.Collide(&world, &worldRules);
-        system.Physics(&world, &worldRules, &playerRules);
+        running = system.Collide(&world, &rules);
+        system.Physics(&world, &rules);
         system.Render(&world, &gfx, canvas);
         Sleep(100);
         if(key == KEY_ESC){
@@ -34,7 +33,7 @@ int main()
         }
     }
 
-    worldRules.Destroy(&world);
+    rules.world.Destroy(&world);
     showcursor();
     resetColor();
     gotoXY(2, (SCREEN_HEIGHT/2)+2);

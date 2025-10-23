@@ -35,16 +35,7 @@
 #define LIGHTCYAN 0xe
 #define WHITE 0xf
 
-typedef struct
-{
-    void (*Clear)(Canvas *, BYTE);
-    void (*SetPixel)(Canvas *, int, int, BYTE);
-    void (*SetLine)(Canvas *, int, int, int, int, BYTE);
-    void (*SetLineDot)(Canvas *, int, int, int, int, BYTE);
-    void (*Draw)(Canvas *, int, int);
-} Graphic;
-
-static void Graphic_UpdatePixelColor(Canvas *c, int x, int logicalY, BYTE newColor, int isUpper)
+static inline void Graphic_UpdatePixelColor(Canvas *c, int x, int logicalY, BYTE newColor, int isUpper)
 {
     int index = logicalY * c->width + x;
     if (isUpper)
@@ -53,7 +44,7 @@ static void Graphic_UpdatePixelColor(Canvas *c, int x, int logicalY, BYTE newCol
         c->buffer[index].color = (c->buffer[index].color & 0xF0) | (newColor & 0x0F);
 }
 
-static void Graphic_Clear(Canvas *c, BYTE color)
+static inline void Graphic_Clear(Canvas *c, BYTE color)
 {
     int length = c->width * c->logicalHeight;
     BYTE combined = (color << 4) | color;
@@ -61,7 +52,7 @@ static void Graphic_Clear(Canvas *c, BYTE color)
         c->buffer[i].color = combined;
 }
 
-static void Graphic_SetPixel(Canvas *c, int x, int y, BYTE color)
+static inline void Graphic_SetPixel(Canvas *c, int x, int y, BYTE color)
 {
     if (x >= 0 && x < c->width && y >= 0 && y < c->height)
     {
@@ -71,7 +62,7 @@ static void Graphic_SetPixel(Canvas *c, int x, int y, BYTE color)
     }
 }
 
-static void Graphic_SetLine(Canvas *c, int x0, int y0, int x1, int y1, BYTE color)
+static inline void Graphic_SetLine(Canvas *c, int x0, int y0, int x1, int y1, BYTE color)
 {
     int dx = abs(x1 - x0);
     int dy = abs(y1 - y0);
@@ -99,7 +90,7 @@ static void Graphic_SetLine(Canvas *c, int x0, int y0, int x1, int y1, BYTE colo
     }
 }
 
-static void Graphic_SetLineDot(Canvas *c, int x0, int y0, int x1, int y1, BYTE color)
+static inline void Graphic_SetLineDot(Canvas *c, int x0, int y0, int x1, int y1, BYTE color)
 {
     int drawable = 1;
     int dx = abs(x1 - x0);
@@ -132,7 +123,7 @@ static void Graphic_SetLineDot(Canvas *c, int x0, int y0, int x1, int y1, BYTE c
     }
 }
 
-static void Graphic_Draw(Canvas *c, int startX, int startY)
+static inline void Graphic_Draw(Canvas *c, int startX, int startY)
 {
     for (int row = 0; row < c->logicalHeight; row++)
     {
@@ -147,8 +138,17 @@ static void Graphic_Draw(Canvas *c, int startX, int startY)
     resetColor();
 }
 
+typedef struct
+{
+    void (*Clear)(Canvas *, BYTE);
+    void (*SetPixel)(Canvas *, int, int, BYTE);
+    void (*SetLine)(Canvas *, int, int, int, int, BYTE);
+    void (*SetLineDot)(Canvas *, int, int, int, int, BYTE);
+    void (*Draw)(Canvas *, int, int);
+} Graphic;
+
 // Inicializador
-static inline Graphic Graphic_Init(void)
+Graphic Graphic_Init(void)
 {
     Graphic g;
     g.Clear = Graphic_Clear;
