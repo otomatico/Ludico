@@ -15,8 +15,7 @@
 #define GRAVITY 1
 #define MAX_ENTITIES 64
 #define MAX_BODY_SNAKE 8
-
-
+#define MAX_TILES 3
 
 // #define LINUX       // Si quieres compilar en linux, por defecto es para windows
 

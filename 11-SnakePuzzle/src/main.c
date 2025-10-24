@@ -15,7 +15,7 @@ int main()
 
     rules.world.Initialize(&world);
     rules.player.Initialize(world.player,0,0);
-    rules.map.Load(&world, Tiles, &rules, 0);
+    rules.map.Load(&world, Tiles, &rules.world, 0);
     hidecursor();
     cleaner();
 

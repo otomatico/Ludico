@@ -4,7 +4,7 @@
 
 #include "../etc/mapTiles.c"
 #include "../lib/Engine2D.h"
-#include "Components.c"
+#include "Components.h"
 
 
 static inline void InputSystem(Entity_ECS *player, int key)
@@ -76,10 +76,9 @@ static inline int CollisionSystem(World_ECS *w, Component *c)
     switch (hit)
     {
     case ENTITY_EXIT:
+        int level = w->id+1;
         c->world.Destroy(w);
-        c->world.Initialize(w);
-        w->id++;
-        c->map.Load(w, Tiles, c, w->id);
+        c->map.Load(w, Tiles, &(c->world), level);
         break;
     case ENTITY_FOOD:
         c->world.EnabledEntity(w, head, 0);

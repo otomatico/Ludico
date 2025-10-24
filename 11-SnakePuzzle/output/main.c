@@ -1,0 +1,900 @@
+/*⚡ env*/
+#ifndef _ENV_H_
+#define _ENV_H_
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define SCREEN_WIDTH 40
+#define SCREEN_HEIGHT 20
+#define MARGIN_X 2
+#define MARGIN_Y 2
+#define GROUND_Y (SCREEN_HEIGHT - 2)
+
+#define GRAVITY 1
+#define MAX_ENTITIES 64
+#define MAX_BODY_SNAKE 8
+#define MAX_TILES 3
+
+// #define LINUX       // Si quieres compilar en linux, por defecto es para windows
+
+#ifndef allocate
+#define allocate(A) (A *)malloc(sizeof(A))
+#define allocateArray(A, B) (A *)malloc(sizeof(A) * ((B > 0) ? (B) : 1))
+#endif
+
+#ifndef BYTE
+typedef unsigned char BYTE;
+#endif
+
+#ifndef WORD
+typedef unsigned short WORD;
+#endif
+
+#endif /*🧱 canvas.h*/
+#ifndef _CANVAS_H_
+#define _CANVAS_H_
+
+typedef struct
+{
+    BYTE color; // foreground (4 bits altos) | background (4 bits bajos)
+} Pixel;
+
+typedef struct
+{
+    int width;
+    int height;        // Altura física (en píxeles)
+    int logicalHeight; // Altura lógica (en caracteres)
+    Pixel *buffer;
+} Canvas;
+
+// Funciones base del canvas
+static inline Canvas *Canvas_Create(int width, int height)
+{
+    Canvas *c = allocate(Canvas);
+    if (!c)
+        return NULL;
+    c->width = width;
+    c->height = height;
+    c->logicalHeight = height / 2;
+    int length = width * c->logicalHeight;
+    c->buffer = allocateArray(Pixel, length);
+    memset(c->buffer, 0, length * sizeof(Pixel));
+    return c;
+}
+
+static inline void Canvas_Destroy(Canvas *c)
+{
+    if (c)
+    {
+        free(c->buffer);
+        free(c);
+    }
+}
+
+#endif
+/*🎨 graphic.h*/
+#ifndef _GRAPHIC_H_
+#define _GRAPHIC_H_
+
+#define colorGraphic(front, back) printf("\e[%d;%d;%dm", (front & 0x8 ? 1 : 0), ((back & 0x7) + (back & 0x8 ? 100 : 40)), ((front & 0x7) + 30))
+#define resetColor() printf("\e[0m")
+#define gotoXY(X, Y) printf("\e[%d;%dH", (Y), (X))
+#define hidecursor() printf("\e[?25l")
+#define showcursor() printf("\e[?25h")
+#define cleaner() printf("\e[1;1H\e[2J\e[0m")
+
+#define CHAR_UPPER 0xdf
+
+// COLORES
+#define BLACK 0x0
+#define RED 0x1
+#define GREEN 0x2
+#define YELLOW 0x3
+#define BLUE 0x4
+#define MAGENTA 0x5
+#define CYAN 0x6
+#define LIGHTGREY 0x7
+#define DARKGREY 0x8
+#define LIGHTRED 0x9
+#define LIGHTGREEN 0xa
+#define LIGHTYELLOW 0xb
+#define LIGHTBLUE 0xc
+#define LIGHTMAGENTA 0xd
+#define LIGHTCYAN 0xe
+#define WHITE 0xf
+
+static inline void Graphic_UpdatePixelColor(Canvas *c, int x, int logicalY, BYTE newColor, int isUpper)
+{
+    int index = logicalY * c->width + x;
+    if (isUpper)
+        c->buffer[index].color = (newColor << 4) | (c->buffer[index].color & 0x0F);
+    else
+        c->buffer[index].color = (c->buffer[index].color & 0xF0) | (newColor & 0x0F);
+}
+
+static inline void Graphic_Clear(Canvas *c, BYTE color)
+{
+    int length = c->width * c->logicalHeight;
+    BYTE combined = (color << 4) | color;
+    for (int i = 0; i < length; i++)
+        c->buffer[i].color = combined;
+}
+
+static inline void Graphic_SetPixel(Canvas *c, int x, int y, BYTE color)
+{
+    if (x >= 0 && x < c->width && y >= 0 && y < c->height)
+    {
+        int logicalY = y / 2;
+        int isUpper = (y % 2 == 0);
+        Graphic_UpdatePixelColor(c, x, logicalY, color, isUpper);
+    }
+}
+
+static inline void Graphic_SetLine(Canvas *c, int x0, int y0, int x1, int y1, BYTE color)
+{
+    int dx = abs(x1 - x0);
+    int dy = abs(y1 - y0);
+    int sx = (x0 < x1) ? 1 : -1;
+    int sy = (y0 < y1) ? 1 : -1;
+    int err = dx - dy;
+
+    while (1)
+    {
+        Graphic_SetPixel(c, x0, y0, color);
+        if (x0 == x1 && y0 == y1)
+            break;
+
+        int e2 = 2 * err;
+        if (e2 > -dy)
+        {
+            err -= dy;
+            x0 += sx;
+        }
+        if (e2 < dx)
+        {
+            err += dx;
+            y0 += sy;
+        }
+    }
+}
+
+static inline void Graphic_SetLineDot(Canvas *c, int x0, int y0, int x1, int y1, BYTE color)
+{
+    int drawable = 1;
+    int dx = abs(x1 - x0);
+    int dy = abs(y1 - y0);
+    int sx = (x0 < x1) ? 1 : -1;
+    int sy = (y0 < y1) ? 1 : -1;
+    int err = dx - dy;
+
+    while (1)
+    {
+        if (drawable)
+            Graphic_SetPixel(c, x0, y0, color);
+
+        drawable = !drawable;
+
+        if (x0 == x1 && y0 == y1)
+            break;
+
+        int e2 = 2 * err;
+        if (e2 > -dy)
+        {
+            err -= dy;
+            x0 += sx;
+        }
+        if (e2 < dx)
+        {
+            err += dx;
+            y0 += sy;
+        }
+    }
+}
+
+static inline void Graphic_Draw(Canvas *c, int startX, int startY)
+{
+    for (int row = 0; row < c->logicalHeight; row++)
+    {
+        gotoXY(startX, startY + row);
+        for (int col = 0; col < c->width; col++)
+        {
+            Pixel p = c->buffer[row * c->width + col];
+            colorGraphic((p.color >> 4) & 0x0F, p.color & 0x0F);
+            putchar(CHAR_UPPER);
+        }
+    }
+    resetColor();
+}
+
+typedef struct
+{
+    void (*Clear)(Canvas *, BYTE);
+    void (*SetPixel)(Canvas *, int, int, BYTE);
+    void (*SetLine)(Canvas *, int, int, int, int, BYTE);
+    void (*SetLineDot)(Canvas *, int, int, int, int, BYTE);
+    void (*Draw)(Canvas *, int, int);
+} Graphic;
+
+// Inicializador
+Graphic Graphic_Init(void)
+{
+    Graphic g;
+    g.Clear = Graphic_Clear;
+    g.SetPixel = Graphic_SetPixel;
+    g.SetLine = Graphic_SetLine;
+    g.SetLineDot = Graphic_SetLineDot;
+    g.Draw = Graphic_Draw;
+    return g;
+}
+
+#endif
+#ifndef _GAMEPAD_H_
+#define _GAMEPAD_H_
+#ifdef LINUX
+// Codigo para LINUX
+#include <unistd.h>
+#define Sleep(a) usleep(a * 1000)
+
+#include <fcntl.h>
+#include <termios.h>
+// Captura de teclado
+static int _initialized_ = 0;
+void init_kbhit()
+{
+    struct termios oldt, newt;
+
+    tcgetattr(STDIN_FILENO, &oldt);
+    newt = oldt;
+    newt.c_lflag &= ~(ICANON | ECHO);
+    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+    fcntl(STDIN_FILENO, F_SETFL, fcntl(STDIN_FILENO, F_GETFL) | O_NONBLOCK);
+    _initialized_ = 1;
+}
+
+int _kbhit()
+{
+    if (!_initialized_)
+    {
+        init_kbhit();
+    }
+    int ch = getchar();
+    if (ch != EOF)
+    {
+        ungetc(ch, stdin);
+        return 1;
+    }
+}
+#else
+// Codigo para WINDOWS
+#include <conio.h>   // _kbhit y _getch
+#include <windows.h> //Sleep
+#endif
+
+// Constante para GamePAD
+#define KEY_UP 72
+#define KEY_DOWN 80
+#define KEY_LEFT 75
+#define KEY_RIGHT 77
+
+#define KEY_ESC 27
+#define KEY_SPACE 32
+#define KEY_ENTER 10
+#define KEY_A 97
+#define KEY_B 115
+#define KEY_EMPTY 0
+
+int press()
+{
+    int key = KEY_EMPTY;
+    if (_kbhit())
+    {
+        key = _getch();
+        if (key == 224)
+        {
+            key = _getch();
+        }
+        switch (key)
+        {
+        case KEY_UP:
+        case KEY_DOWN:
+        case KEY_RIGHT:
+        case KEY_LEFT:
+        case KEY_ESC:
+        case KEY_SPACE:
+        case KEY_ENTER:
+        case KEY_A:
+        case KEY_B:
+            return key;
+        }
+    }
+    return KEY_EMPTY;
+}
+
+#endif /*🧩 Entities.h*/
+#ifndef _ENTITY_H_
+#define _ENTITY_H_
+
+#ifndef TypeEntity
+typedef enum _TE TypeEntity;
+#endif
+
+typedef struct
+{
+    int dx, dy;
+    int activo;
+} Velocity;
+
+typedef struct
+{
+    int active;
+    int type;
+    Velocity vel; // opcionalmente obligatoria
+    void *data;   // apunta a la estructura concreta
+} Entity_ECS;
+
+typedef struct
+{
+    int id;
+    int count;
+    Entity_ECS *player;                 // Extrair Jugador .. reduz complejidad
+    Entity_ECS *entities[MAX_ENTITIES]; // OJO Array de punteros
+} World_ECS;
+
+// Destruir entidad
+void Entity_Destroy(Entity_ECS *e)
+{
+    if (!e)
+        return;
+    free(e->data);
+    free(e);
+}
+#endif
+/*🧩 EntitySnake.h*/
+#ifndef _ENTITY_SNAKE_H_
+#define _ENTITY_SNAKE_H_
+
+typedef enum _TE
+{
+    ENTITY_NONE,
+    ENTITY_SNAKE,    // 🐍 Snake
+    ENTITY_FOOD,     // 🍎 Food
+    ENTITY_PLATFORM, // 🧱 Wall
+    ENTITY_ROCK,     // 🪨 Rock
+    ENTITY_SPIKE,    // 🔱 Spike
+    ENTITY_EXIT      // 🚪 Door
+} TypeEntity;
+
+typedef struct
+{
+    int x, y;
+} PointData;
+
+int EqualPoint(PointData *a, PointData *b)
+{
+    return a->x == b->x && a->y == b->y;
+}
+
+typedef struct
+{
+    int length;
+    int gravityEnabled;
+    PointData body[MAX_BODY_SNAKE];
+} SnakeData;
+
+Entity_ECS *CreateEntity(TypeEntity type, int x, int y)
+{
+    Entity_ECS *e = allocate(Entity_ECS);
+    e->type = type;
+    e->active = 1;
+
+    if (type == ENTITY_SNAKE)
+    {
+        SnakeData *sd = allocate(SnakeData);
+        sd->length = 3;
+        for (int i = 0; i < sd->length; i++)
+        {
+            sd->body[i].x = x - i;
+            sd->body[i].y = y;
+        }
+        sd->gravityEnabled = 1;
+        e->data = sd;
+    }
+    else
+    {
+        PointData *p = allocate(PointData);
+        p->x = x;
+        p->y = y;
+        e->data = p;
+    }
+    e->vel.dx = 0;
+    e->vel.dy = 0;
+    return e;
+}
+#endif
+/*MapEntity.h*/
+#ifndef _ENTITY_MAP_H_
+#define _ENTITY_MAP_H_
+
+typedef enum
+{
+    APOINT,
+    LINE_HORIZONTAL,
+    LINE_VERTICAL
+} TypeDraw;
+
+typedef struct
+{
+    TypeDraw draw;
+    TypeEntity entity;
+    int x;
+    int y;
+    int lenght;
+} EntityDraw;
+
+typedef struct
+{
+    int lenght;
+    EntityDraw *tiles;
+} MapEntity;
+#endif
+/*MapTitles.c*/
+#ifndef _MAPTILES_H_
+#define _MAPTILES_H_
+
+MapEntity Map01 = (MapEntity){5, (EntityDraw[5]){
+                                     (EntityDraw){APOINT, ENTITY_SNAKE, 8, GROUND_Y - 2},
+                                     (EntityDraw){APOINT, ENTITY_FOOD, 8, GROUND_Y - 3},
+                                     (EntityDraw){LINE_HORIZONTAL, ENTITY_PLATFORM, 5, GROUND_Y - 1, SCREEN_WIDTH - 10},
+                                     (EntityDraw){LINE_HORIZONTAL, ENTITY_PLATFORM, 10, GROUND_Y - 4, 10},
+                                     (EntityDraw){APOINT, ENTITY_EXIT, 23, GROUND_Y - 5}}};
+
+MapEntity Map02 = (MapEntity){5, (EntityDraw[5]){
+                                     (EntityDraw){APOINT, ENTITY_SNAKE, 8, GROUND_Y - 2},
+                                     (EntityDraw){APOINT, ENTITY_ROCK, 9, GROUND_Y - 2},
+                                     (EntityDraw){LINE_HORIZONTAL, ENTITY_PLATFORM, 5, GROUND_Y - 1, 10},
+                                     (EntityDraw){LINE_HORIZONTAL, ENTITY_PLATFORM, 10, GROUND_Y - 4, 10},
+                                     (EntityDraw){APOINT, ENTITY_EXIT, 22, GROUND_Y - 3}}};
+
+// Es una array de punteros que apuntan a los datos estaticos
+MapEntity *Tiles[MAX_TILES] = {&Map01, &Map02, &Map01};
+
+#endif
+/* ComponentWorld.c*/
+#ifndef _COMPONENT_WORLD_C_
+#define _COMPONENT_WORLD_C_
+
+// Component World
+//  Inicializar el "MUNDO"
+static inline void World_Init(World_ECS *w)
+{
+    for (int i = 0; i < MAX_ENTITIES; i++)
+        w->entities[i] = NULL;
+    w->count = 0;
+    w->player = NULL;
+    w->id = 0;
+}
+
+// Crear nueva entidad y devolver índice
+static inline int World_CreateEntity(World_ECS *w, TypeEntity type, int x, int y)
+{
+    if (type == ENTITY_SNAKE)
+    {
+        w->player = CreateEntity(type, x, y);
+        return 0;
+    }
+    for (int i = 0; i < MAX_ENTITIES; i++)
+    {
+        if (w->entities[i] == NULL)
+        {
+            w->entities[i] = CreateEntity(type, x, y);
+            w->count++;
+            return i;
+        }
+    }
+    return -1; // no hay espacio
+}
+
+static inline void World_EntityEnabledByPoint(World_ECS *w, PointData *point, int active)
+{
+    for (int i = 0; i < w->count; i++)
+    {
+        if (EqualPoint(w->entities[i]->data, point))
+        {
+            w->entities[i]->active = active;
+            return;
+        }
+    }
+}
+
+static inline void World_Destroy(World_ECS *w)
+{
+    for (int i = 0; i < w->count; i++)
+    {
+        Entity_Destroy(w->entities[i]);
+        w->entities[i] = NULL;
+    }
+    Entity_Destroy(w->player);
+    w->player = NULL;
+    w->count = 0;
+}
+
+static inline TypeEntity World_PointCollision(World_ECS *w, PointData *position)
+{
+    for (int index = 0; index < MAX_ENTITIES; index++)
+    {
+        Entity_ECS *e = w->entities[index];
+        if (!e || !e->active)
+            continue;
+
+        PointData *f = (PointData *)e->data;
+        if (EqualPoint(f, position))
+        {
+            return e->type;
+        }
+    }
+    return ENTITY_NONE;
+}
+
+typedef struct
+{
+    void (*Initialize)(World_ECS *);
+    int (*CreateEntity)(World_ECS *, TypeEntity, int, int);
+    TypeEntity (*Collide)(World_ECS *, PointData *);
+    void (*EnabledEntity)(World_ECS *, PointData *, int);
+    void (*Destroy)(World_ECS *);
+} ComponentWorld;
+
+ComponentWorld ComponentWorld_Init(void)
+{
+    ComponentWorld world;
+
+    world.Initialize = World_Init;
+    world.CreateEntity = World_CreateEntity;
+    world.EnabledEntity = World_EntityEnabledByPoint;
+    world.Destroy = World_Destroy;
+    world.Collide = World_PointCollision;
+    return world;
+}
+#endif
+/*ComponentPlayer.c*/
+#ifndef _COMPONENT_PLAYER_C_
+#define _COMPONENT_PLAYER_C_
+
+// Component Player
+
+// Inicializar Player
+static inline void Player_Init(Entity_ECS *e, int x, int y)
+{
+    e = allocate(Entity_ECS);
+    e->type = ENTITY_SNAKE;
+    e->active = 1;
+
+    SnakeData *sd = allocate(SnakeData);
+    sd->length = 3;
+    for (int i = 0; i < sd->length; i++)
+    {
+        sd->body[i].x = x - i;
+        sd->body[i].y = y;
+    }
+    sd->gravityEnabled = 1;
+    e->data = sd;
+}
+
+// Colisión snake-tail
+static inline TypeEntity SnakeSelfCollision(Entity_ECS *player, PointData *position)
+{
+    SnakeData *sd = (SnakeData *)player->data;
+    PointData *tail = NULL;
+    // Recorremos el cuerpo a partir del segundo segmento
+    for (int index = 0; index < sd->length; index++)
+    {
+        tail = &sd->body[index];
+        if (EqualPoint(tail, position))
+        {
+            return ENTITY_SNAKE;
+        }
+    }
+    return ENTITY_NONE;
+}
+
+// Move Player
+static inline void Player_Move(Entity_ECS *player, int supported)
+{
+    SnakeData *snake = (SnakeData *)player->data;
+    if (!supported)
+    {
+        player->vel.dx = 0;
+        player->vel.dy = GRAVITY;
+    }
+    // Mover cola siguiendo la cabeza
+    if (player->vel.dx || player->vel.dy)
+    {
+        for (int j = snake->length; j > 0; j--)
+        {
+            if (supported)
+            {
+                snake->body[j].x = snake->body[j - 1].x;
+                snake->body[j].y = snake->body[j - 1].y;
+            }
+            else
+            {
+                snake->body[j].y += GRAVITY; // todo cae
+            }
+        }
+        // Mover cabeza
+        snake->body[0].x += player->vel.dx;
+        snake->body[0].y += player->vel.dy;
+    }
+}
+
+typedef struct
+{
+    void (*Initialize)(Entity_ECS *, int x, int y);
+    void (*Moviment)(Entity_ECS *, int);
+    TypeEntity (*CollideSelf)(Entity_ECS *player, PointData *position);
+    void (*Destroy)(Entity_ECS *);
+} ComponentPlayer;
+
+ComponentPlayer ComponentPlayer_Init(void)
+{
+    ComponentPlayer player;
+
+    player.Initialize = Player_Init;
+    player.Moviment = Player_Move;
+    player.CollideSelf = SnakeSelfCollision;
+    player.Destroy = Entity_Destroy;
+    return player;
+}
+
+#endif
+/* ComponentMap.c*/
+#ifndef _COMPONENT_MAP_C_
+#define _COMPONENT_MAP_C_
+
+// Componentes
+// # Map
+void MapLoad(World_ECS *w, MapEntity **Tile, ComponentWorld *world, int level)
+{
+    MapEntity *Map = Tile[level % MAX_TILES];
+    for (int index = 0; index < Map->lenght; index++)
+    {
+        EntityDraw *line = &(Map->tiles[index]);
+        switch (line->draw)
+        {
+        case APOINT:
+            world->CreateEntity(w, line->entity, line->x, line->y);
+            break;
+        case LINE_HORIZONTAL:
+            for (int x = 0; x < line->lenght; x++)
+            {
+                world->CreateEntity(w, line->entity, line->x + x, line->y);
+            }
+            break;
+        case LINE_VERTICAL:
+            for (int y = 0; y < line->lenght; y++)
+            {
+                world->CreateEntity(w, line->entity, line->x, line->y + y);
+            }
+            break;
+        }
+    }
+    w->id = level;
+}
+
+typedef struct C_Map
+{
+    void (*Load)(World_ECS *, MapEntity **, ComponentWorld *, int level);
+} ComponentMap;
+
+ComponentMap ComponentMap_Init(void)
+{
+    ComponentMap m;
+    m.Load = MapLoad;
+    return m;
+}
+#endif
+/* Component.c*/
+#ifndef _COMPONENTS_C_
+#define _COMPONENTS_C_
+
+// Componentes
+typedef struct _Component
+{
+    ComponentWorld world;
+    ComponentPlayer player;
+    ComponentMap map;
+} Component;
+
+Component Component_Init(void)
+{
+    Component c;
+    c.world = ComponentWorld_Init();
+    c.player = ComponentPlayer_Init();
+    c.map = ComponentMap_Init();
+    return c;
+}
+
+#endif /*🕹️ systems.h*/
+#ifndef _SYSTEMS_C_
+#define _SYSTEMS_C_
+
+static inline void InputSystem(Entity_ECS *player, int key)
+{
+    switch (key)
+    {
+    case KEY_LEFT:
+        player->vel.dx = -1;
+        break;
+    case KEY_RIGHT:
+        player->vel.dx = 1;
+        break;
+    case KEY_UP:
+        player->vel.dy = -1;
+        break;
+    case KEY_DOWN:
+        player->vel.dy = 1;
+        break;
+    }
+}
+
+static inline void PhysicsSystem(World_ECS *w, Component *c)
+{
+    Entity_ECS *player = w->player;
+    SnakeData *snake = (SnakeData *)player->data;
+    // Verificar si alguna parte está apoyada
+    int supported = 0;
+    PointData position;
+    // Esta soportado por algun elemento
+    for (int index = 0; index < snake->length && !supported; index++)
+    {
+        position.x = snake->body[index].x;
+        position.y = snake->body[index].y + 1;
+        if (c->world.Collide(w, &position) != ENTITY_NONE)
+        {
+            supported = 1;
+        }
+    }
+
+    PointData head = (PointData){snake->body[0].x + player->vel.dx, snake->body[0].y + player->vel.dy};
+    // Evite subir sobre si mismo o traspasar paredes
+    TypeEntity entity = c->world.Collide(w, &head);
+    // Si la posicion esta Ocupada
+    if (c->player.CollideSelf(player, &head) == ENTITY_SNAKE)
+    {
+        player->vel.dx = 0;
+        player->vel.dy = 0;
+    }
+    if (entity != ENTITY_PLATFORM && entity != ENTITY_ROCK)
+    {
+        c->player.Moviment(player, supported);
+    }
+    // Reset de velocidades temporales
+    player->vel.dx = 0;
+    player->vel.dy = 0;
+}
+
+static inline int CollisionSystem(World_ECS *w, Component *c)
+{
+    SnakeData *snake = (SnakeData *)w->player->data;
+    PointData *head = &snake->body[0];
+
+    // Caída al vacío
+    if (head->y > SCREEN_HEIGHT)
+    {
+        return 0;
+    }
+    TypeEntity hit = c->world.Collide(w, head);
+    switch (hit)
+    {
+    case ENTITY_EXIT:
+        int level = w->id + 1;
+        c->world.Destroy(w);
+        w->id = level;
+        c->map.Load(w, Tiles, &(c->world), level);
+        break;
+    case ENTITY_FOOD:
+        c->world.EnabledEntity(w, head, 0);
+        snake->length++;
+        break;
+    }
+    return 1;
+}
+
+static inline void RenderSystem(World_ECS *w, Graphic *gfx, Canvas *c)
+{
+    gfx->Clear(c, DARKGREY);
+    for (int index = 0; index < w->count; index++)
+    {
+        Entity_ECS *e = w->entities[index];
+        if (!e->active)
+            continue;
+
+        PointData *p = (PointData *)e->data;
+        BYTE color = WHITE;
+        if (e->type == ENTITY_SPIKE)
+            color = LIGHTMAGENTA;
+        if (e->type == ENTITY_ROCK)
+            color = LIGHTGREY;
+        if (e->type == ENTITY_FOOD)
+            color = LIGHTRED;
+        if (e->type == ENTITY_PLATFORM)
+            color = YELLOW;
+        if (e->type == ENTITY_EXIT)
+            color = CYAN;
+        gfx->SetPixel(c, p->x, p->y, color);
+    }
+
+    SnakeData *sd = (SnakeData *)w->player->data;
+    gfx->SetPixel(c, sd->body[0].x, sd->body[0].y, BLUE);
+    for (int index = 1; index < sd->length; index++)
+    {
+        gfx->SetPixel(c, sd->body[index].x, sd->body[index].y, GREEN);
+    }
+
+    gfx->Draw(c, MARGIN_X, MARGIN_Y);
+    gotoXY(SCREEN_WIDTH + MARGIN_X + 1, MARGIN_Y);
+    printf("Level %d", w->id + 1);
+    resetColor();
+}
+
+typedef struct
+{
+    void (*WatchGamePad)(Entity_ECS *, int);
+
+    void (*Physics)(World_ECS *, Component *);
+    int (*Collide)(World_ECS *, Component *);
+    void (*Render)(World_ECS *, Graphic *, Canvas *);
+} System;
+
+System System_Init(void)
+{
+    System sys;
+    sys.WatchGamePad = InputSystem;
+    sys.Physics = PhysicsSystem;
+    sys.Collide = CollisionSystem;
+    sys.Render = RenderSystem;
+    return sys;
+}
+
+#endif
+/*🎮 main.c*/
+
+int main()
+{
+    Canvas *canvas = Canvas_Create(SCREEN_WIDTH, SCREEN_HEIGHT);
+    Graphic gfx = Graphic_Init();
+
+    World_ECS world;
+    Component rules = Component_Init();
+    System system = System_Init();
+
+    rules.world.Initialize(&world);
+    rules.player.Initialize(world.player, 0, 0);
+    rules.map.Load(&world, Tiles, &rules.world, 0);
+    hidecursor();
+    cleaner();
+
+    int running = 1;
+    while (running)
+    {
+        int key = press();
+        system.WatchGamePad(world.player, key);
+        running = system.Collide(&world, &rules);
+        system.Physics(&world, &rules);
+        system.Render(&world, &gfx, canvas);
+        Sleep(100);
+        if (key == KEY_ESC)
+        {
+            running = 0;
+        }
+    }
+
+    rules.world.Destroy(&world);
+    showcursor();
+    resetColor();
+    gotoXY(2, (SCREEN_HEIGHT / 2) + 2);
+    printf("Juego terminado.\n");
+    return 0;
+}

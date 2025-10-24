@@ -3,8 +3,12 @@
 .\src\lib\Graphic.h
 .\src\lib\Keyboard.h
 .\src\ecs\Entities.h
+.\src\ecs\EntitySnake.h
 .\src\ecs\MapEntity.h
 .\src\etc\mapTiles.c
-.\src\ecs\Components.c
+.\src\ecs\ComponentWorld.c
+.\src\ecs\ComponentPlayer.c
+.\src\ecs\ComponentMap.c
+.\src\ecs\Components.h
 .\src\ecs\Systems.c
 .\src\main.c

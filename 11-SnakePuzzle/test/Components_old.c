@@ -2,7 +2,7 @@
 #ifndef _COMPONENTS_C_
 #define _COMPONENTS_C_
 
-// #include "Entities.h"
+#include "EntitySnake.h"
 #include "MapEntity.h"
 // Componentes
 typedef struct _Component Component;

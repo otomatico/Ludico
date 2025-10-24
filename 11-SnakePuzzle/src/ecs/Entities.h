@@ -3,34 +3,9 @@
 #define _ENTITY_H_
 
 #include "../etc/env"
-
-typedef enum
-{
-    ENTITY_NONE,
-    ENTITY_SNAKE,       // 🐍 Snake
-    ENTITY_FOOD,        // 🍎 Food
-    ENTITY_PLATFORM,    // 🧱 Wall
-    ENTITY_ROCK,        // 🪨 Rock
-    ENTITY_SPIKE,       // 🔱 Spike
-    ENTITY_EXIT         // 🚪 Door
-} TypeEntity;
-
-typedef struct
-{
-    int x, y;
-} PointData;
-
-int EqualPoint(PointData *a, PointData *b)
-{
-    return a->x == b->x && a->y == b->y;
-}
-
-typedef struct
-{
-    int length;
-    int gravityEnabled;
-    PointData body[MAX_BODY_SNAKE];
-} SnakeData;
+#ifndef TypeEntity
+typedef enum _TE TypeEntity;
+#endif
 
 typedef struct
 {
@@ -41,7 +16,7 @@ typedef struct
 typedef struct
 {
     int active;
-    TypeEntity type;
+    int type;
     Velocity vel; // opcionalmente obligatoria
     void *data;   // apunta a la estructura concreta
 } Entity_ECS;
@@ -54,4 +29,12 @@ typedef struct
     Entity_ECS *entities[MAX_ENTITIES]; // OJO Array de punteros
 } World_ECS;
 
+// Destruir entidad
+void Entity_Destroy(Entity_ECS *e)
+{
+    if (!e)
+        return;
+    free(e->data);
+    free(e);
+}
 #endif

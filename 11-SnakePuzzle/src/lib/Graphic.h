@@ -138,12 +138,21 @@ static inline void Graphic_Draw(Canvas *c, int startX, int startY)
     resetColor();
 }
 
+static inline void Graphic_SetRectangle(Canvas *c, int x0, int y0, int width, int height, BYTE color)
+{
+    for (int y = y0; y < y0 + height; y++)
+    {
+        Graphic_SetLine(c, x0, y, x0 + width, y, color);
+    }
+}
+
 typedef struct
 {
     void (*Clear)(Canvas *, BYTE);
     void (*SetPixel)(Canvas *, int, int, BYTE);
     void (*SetLine)(Canvas *, int, int, int, int, BYTE);
     void (*SetLineDot)(Canvas *, int, int, int, int, BYTE);
+    void (*SetRectangle)(Canvas *, int, int, int, int, BYTE);
     void (*Draw)(Canvas *, int, int);
 } Graphic;
 
@@ -155,6 +164,7 @@ Graphic Graphic_Init(void)
     g.SetPixel = Graphic_SetPixel;
     g.SetLine = Graphic_SetLine;
     g.SetLineDot = Graphic_SetLineDot;
+    g.SetRectangle = Graphic_SetRectangle;
     g.Draw = Graphic_Draw;
     return g;
 }

@@ -1,3 +1,3 @@
 #include "Entities.h"
-#include "Components.c"
+#include "Components.h"
 #include "Systems.c"
