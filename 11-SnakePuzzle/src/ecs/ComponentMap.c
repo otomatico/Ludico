@@ -1,8 +1,6 @@
-/* ComponentMap.c*/
 #ifndef _COMPONENT_MAP_C_
 #define _COMPONENT_MAP_C_
 
-// #include "Components.c"
 #include "MapEntity.h"
 #include "ComponentWorld.c"
 #include "ComponentPlayer.c"

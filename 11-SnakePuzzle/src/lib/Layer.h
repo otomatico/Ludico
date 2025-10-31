@@ -1,6 +1,5 @@
-/* 🪄 Layer.h — Manejo de capas, scroll y fusión inteligente
- * Compatible con Canvas.h y Graphic.h
- */
+// 🪄 Layer.h — Manejo de capas, scroll y fusión inteligente
+// Compatible con Canvas.h y Graphic.h
 
 #ifndef _LAYER_H_
 #define _LAYER_H_

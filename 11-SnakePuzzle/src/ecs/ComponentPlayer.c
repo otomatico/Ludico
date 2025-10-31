@@ -1,4 +1,3 @@
-/*ComponentPlayer.c*/
 #ifndef _COMPONENT_PLAYER_C_
 #define _COMPONENT_PLAYER_C_
 

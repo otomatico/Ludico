@@ -1,4 +1,3 @@
-/*🎮 main.c*/
 #include "ecs/ECS.h"
 #include "etc/Game.c"
 
@@ -14,7 +13,8 @@ int main()
 
     StateGame running = STATE_OPEN;
     int step = 0;
-    while (running != STATE_EXIT)
+
+    do
     {
         switch (running)
         {
@@ -32,19 +32,17 @@ int main()
             int option = press();
             Menu_Render(step);
             step = (step + 1) % 255;
-            switch (option)
+            if (option == KEY_ENTER)
             {
-            case KEY_ENTER:
                 step = 0;
                 running = STATE_START;
                 Game_init(&rules, &world);
                 resetColor();
                 cleaner();
-                break;
-            case KEY_ESC:
-                step = 0;
+            }
+            if (option == KEY_ESC)
+            {
                 running = STATE_EXIT;
-                break;
             }
 
             break;
@@ -56,17 +54,22 @@ int main()
                 step = 0;
             }
             break;
-        case STATE_OVER:            
+        case STATE_OVER:
             running = STATE_OPEN;
+            resetColor();
+            cleaner();
+            break;
+        case STATE_EXIT:
+            rules.world.Destroy(&world);
+        default:
             resetColor();
             cleaner();
             break;
         }
 
         Sleep(50);
-    }
+    } while (running != STATE_EXIT);
 
-    rules.world.Destroy(&world);
     showcursor();
     resetColor();
     gotoXY(2, (SCREEN_HEIGHT / 2) + 2);

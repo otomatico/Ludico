@@ -1,4 +1,3 @@
-/*MapEntity.h*/
 #ifndef _ENTITY_MAP_H_
 #define _ENTITY_MAP_H_
 

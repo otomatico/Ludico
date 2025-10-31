@@ -1,12 +1,7 @@
-/*🎨 graphic.h*/
 #ifndef _GRAPHIC_H_
 #define _GRAPHIC_H_
 
 #include "canvas.h"
-
-//#include <stdlib.h>
-//#include <stdio.h>
-//#include <string.h>
 
 #define colorGraphic(front, back) printf("\e[%d;%d;%dm", (front & 0x8 ? 1 : 0), ((back & 0x7) + (back & 0x8 ? 100 : 40)), ((front & 0x7) + 30))
 #define resetColor() printf("\e[0m")

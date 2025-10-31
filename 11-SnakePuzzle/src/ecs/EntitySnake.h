@@ -1,4 +1,3 @@
-/*🧩 EntitySnake.h*/
 #ifndef _ENTITY_SNAKE_H_
 #define _ENTITY_SNAKE_H_
 

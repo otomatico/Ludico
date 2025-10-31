@@ -29,11 +29,6 @@ MapEntity Map03 = (MapEntity){7, (EntityDraw[7]){
                                 };
 
 // Es una array de punteros que apuntan a los datos estaticos
-MapEntity *Tiles[MAX_TILES] = {
-    &Map01,
-    &Map02, 
-    &Map03,
-    &Map01
-};
+MapEntity *Tiles[MAX_TILES] = {    &Map01,    &Map02,     &Map03,    &Map01};
 
 #endif

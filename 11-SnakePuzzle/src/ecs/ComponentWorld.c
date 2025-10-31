@@ -1,4 +1,3 @@
-/* ComponentWorld.c*/
 #ifndef _COMPONENT_WORLD_C_
 #define _COMPONENT_WORLD_C_
 

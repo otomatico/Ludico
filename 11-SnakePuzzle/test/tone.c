@@ -1,3 +1,4 @@
+//gcc -o ./test/tone.exe ./test/tone.c 
 #include <stdio.h>
 #include <stdlib.h>
 

@@ -2,13 +2,17 @@
 .\src\lib\Canvas.h
 .\src\lib\Graphic.h
 .\src\lib\Keyboard.h
+.\src\lib\Sprites.h
+.\src\lib\Layer.h
 .\src\ecs\Entities.h
 .\src\ecs\EntitySnake.h
 .\src\ecs\MapEntity.h
 .\src\etc\mapTiles.c
+.\src\etc\Sprite.c
 .\src\ecs\ComponentWorld.c
 .\src\ecs\ComponentPlayer.c
 .\src\ecs\ComponentMap.c
 .\src\ecs\Components.h
 .\src\ecs\Systems.c
+.\src\etc\Game.c
 .\src\main.c

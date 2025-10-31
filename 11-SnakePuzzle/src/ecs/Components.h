@@ -1,4 +1,3 @@
-/* Component.c*/
 #ifndef _COMPONENTS_C_
 #define _COMPONENTS_C_
 

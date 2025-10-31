@@ -1,4 +1,3 @@
-/*🕹️ systems.h*/
 #ifndef _SYSTEMS_C_
 #define _SYSTEMS_C_
 
