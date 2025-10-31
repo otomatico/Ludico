@@ -120,8 +120,8 @@ static inline void RenderSystem(World_ECS *w, Graphic *gfx, Canvas *c)
         // gotoXY(2, (SCREEN_HEIGHT / 2) + 2 + index);printf("Player[%d]:{x:%d, y:%d}", index, sd->body[index].x, sd->body[index].y);
     }
 
-    gfx->Draw(c, MARGIN_X, MARGIN_Y);
-    gotoXY(SCREEN_WIDTH + MARGIN_X + 1, MARGIN_Y);
+    gfx->Draw(c, MARGIN_X+8, MARGIN_Y);
+    gotoXY(1, MARGIN_Y);
     printf("Level %d", w->id+1);
     resetColor();
 }

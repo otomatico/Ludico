@@ -157,15 +157,15 @@ typedef struct
 } Graphic;
 
 // Inicializador
-Graphic Graphic_Init(void)
+static Graphic* Graphic_Init(void)
 {
-    Graphic g;
-    g.Clear = Graphic_Clear;
-    g.SetPixel = Graphic_SetPixel;
-    g.SetLine = Graphic_SetLine;
-    g.SetLineDot = Graphic_SetLineDot;
-    g.SetRectangle = Graphic_SetRectangle;
-    g.Draw = Graphic_Draw;
+    Graphic *g= allocate(Graphic);
+    g->Clear = Graphic_Clear;
+    g->SetPixel = Graphic_SetPixel;
+    g->SetLine = Graphic_SetLine;
+    g->SetLineDot = Graphic_SetLineDot;
+    g->SetRectangle = Graphic_SetRectangle;
+    g->Draw = Graphic_Draw;
     return g;
 }
 

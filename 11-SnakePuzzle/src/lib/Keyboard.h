@@ -48,7 +48,7 @@ int _kbhit()
 
 #define KEY_ESC 27
 #define KEY_SPACE 32
-#define KEY_ENTER 10
+#define KEY_ENTER 13
 #define KEY_A 97
 #define KEY_B 115
 #define KEY_EMPTY 0

@@ -33,7 +33,7 @@ typedef struct
 } Canvas;
 
 // Funciones base del canvas
-static inline Canvas *Canvas_Create(int width, int height)
+Canvas *Canvas_Create(int width, int height)
 {
     Canvas *c = allocate(Canvas);
     if (!c)
