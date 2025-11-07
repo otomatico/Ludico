@@ -5,8 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define SCREEN_WIDTH 40
-#define SCREEN_HEIGHT 20
+#define SCREEN_WIDTH 64
+#define SCREEN_HEIGHT 48
 #define MARGIN_X 2
 #define MARGIN_Y 2
 #define GROUND_Y (SCREEN_HEIGHT - 2)

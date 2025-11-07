@@ -14,7 +14,6 @@ typedef struct _Component
     ComponentMap map;
 } Component;
 
-
 Component Component_Init(void)
 {
     Component c;
