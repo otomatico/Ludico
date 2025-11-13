@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Oto Game Dev</title>
+
+    <script src="codemirror.js"></script>
+    <script src="javascript.js"></script>
+    <script src="jshint.min.js"></script>
+    <script src="lint.js"></script>
+    <script src="javascript-lint.js"></script>
+
+    <link rel="stylesheet" href="codemirror.css" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="lint.css" />
+    <!--<link rel="stylesheet" href="docs.css" />-->
+  </head>
+
+  <body>
+    <textarea id="code" name="code">
+
+function update() {
+
+
+
+}
+
+
+function render() {
+
+ 
+  
+}
+
+</textarea>
+    <script>
+      function savefile() {
+        var blob = new Blob([editor.getValue()], {
+          type: "text/plain;charset=utf-8",
+        });
+		fileName = prompt("Nombre del archivo")
+		if(fileName){
+			saveAs(blob, `${fileName}.txt`);
+		}
+      }
+      window.addEventListener("DOMContentLoaded", () => {
+        var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+          mode: "javascript",
+          lineNumbers: true,
+          extraKeys: {
+            "Ctrl-S": savefile,
+          },
+          gutters: ["CodeMirror-lint-markers"],
+          lint: true,
+        });
+        editor.on("change", function () {
+          clearTimeout(delay);
+          delay = setTimeout(updatePreview, 300);
+        });
+      });
+    </script>
+  </body>
+</html>
