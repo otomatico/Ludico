@@ -1,40 +1,51 @@
-#include <genesis.h> // Para VDP_getScreenHeight()
+#ifndef ALL_MAPS_H
+#define ALL_MAPS_H
+
+#define MAX_TILES 4
 #include "TileMap.h"
-// 224 pixels de alto / 8 = 28 tiles
-#define GROUND_Y 27
-static const EntityDrawMap Map01_TilesData[5] = {
-    {.draw = MAP_POINT, .entity = ENTITY_SNAKE, .x = 8, .y = GROUND_Y - 2, .lenght = 0},
-    {.draw = MAP_POINT, .entity = ENTITY_FOOD, .x = 9, .y = GROUND_Y - 3, 0},
-    {.draw = MAP_LINE_HORIZONTAL, .entity = ENTITY_PLATFORM, .x = 5, .y = GROUND_Y - 1, .lenght = 17},
-    {.draw = MAP_LINE_HORIZONTAL, .entity = ENTITY_PLATFORM, .x = 10, .y = GROUND_Y - 4, .lenght = 10},
-    {.draw = MAP_POINT, .entity = ENTITY_EXIT, .x = 23, .y = GROUND_Y - 5, .lenght = 0}};
-static const EntityMap Map01 = {
-    .lenght = 5,
-    .tiles = (EntityDrawMap *)Map01_TilesData // Añade cast o declara .tiles como const
+
+static EntityDrawMap level1_tiles[] = {
+    {MAP_LINE_HORIZONTAL, ENTITY_PLATFORM, 11, 21, 3},
+    {MAP_LINE_HORIZONTAL, ENTITY_PLATFORM, 7, 24, 10},
+    {MAP_POINT, ENTITY_EXIT, 17, 20, 1},
+    {MAP_POINT, ENTITY_FOOD, 10, 22, 1},
+    {MAP_POINT, ENTITY_SNAKE, 10, 23, 1},
 };
 
-static const EntityDrawMap Map02_TilesData[5] = {
-    {.draw = MAP_POINT, .entity = ENTITY_SNAKE, .x = 8, .y = GROUND_Y - 2, .lenght = 0},
-    {.draw = MAP_POINT, .entity = ENTITY_ROCK, .x = 9, .y = GROUND_Y - 2, .lenght = 0},
-    {.draw = MAP_LINE_HORIZONTAL, .entity = ENTITY_PLATFORM, .x = 5, .y = GROUND_Y - 1, .lenght = 10},
-    {.draw = MAP_LINE_HORIZONTAL, .entity = ENTITY_PLATFORM, .x = 10, .y = GROUND_Y - 4, .lenght = 10},
-    {.draw = MAP_POINT, .entity = ENTITY_EXIT, .x = 22, .y = GROUND_Y - 3, .lenght = 0}};
-static const EntityMap Map02 = {
-    .lenght = 5,
-    .tiles = (EntityDrawMap *)Map02_TilesData // Añade cast o declara .tiles como const
+static const EntityMap level1 = {5, level1_tiles};
+
+static EntityDrawMap level2_tiles[] = {
+    {MAP_LINE_HORIZONTAL, ENTITY_PLATFORM, 10, 21, 3},
+    {MAP_LINE_HORIZONTAL, ENTITY_PLATFORM, 6, 24, 6},
+    {MAP_POINT, ENTITY_EXIT, 15, 20, 1},
+    {MAP_POINT, ENTITY_SNAKE, 8, 23, 1},
+    {MAP_POINT, ENTITY_ROCK, 9, 23, 1},
 };
 
-static const EntityDrawMap Map03_TilesData[7] = {
-    (EntityDrawMap){MAP_POINT, ENTITY_SPIKE, 9, GROUND_Y - 2, 0},
-    (EntityDrawMap){MAP_POINT, ENTITY_FOOD, 5, GROUND_Y - 2, 0},
-    (EntityDrawMap){MAP_LINE_HORIZONTAL, ENTITY_PLATFORM, 6, GROUND_Y - 3, 3},
-    (EntityDrawMap){MAP_LINE_HORIZONTAL, ENTITY_PLATFORM, 5, GROUND_Y - 1, 5},
-    (EntityDrawMap){MAP_LINE_VERTICAL, ENTITY_PLATFORM, 10, GROUND_Y - 3, 3},
-    (EntityDrawMap){MAP_POINT, ENTITY_SNAKE, 8, GROUND_Y - 4, 0},
-    (EntityDrawMap){MAP_POINT, ENTITY_EXIT, 13, GROUND_Y - 5, 0}};
-static const EntityMap Map03 = {
-    .lenght = 7,
-    .tiles = (EntityDrawMap *)Map03_TilesData // Añade cast o declara .tiles como const
+static const EntityMap level2 = {5, level2_tiles};
+
+static EntityDrawMap level3_tiles[] = {
+    {MAP_LINE_HORIZONTAL, ENTITY_PLATFORM, 8, 21, 3},
+    {MAP_LINE_HORIZONTAL, ENTITY_PLATFORM, 7, 24, 6},
+    {MAP_LINE_VERTICAL, ENTITY_PLATFORM, 12, 21, 3},
+    {MAP_POINT, ENTITY_SNAKE, 10, 20, 1},
+    {MAP_POINT, ENTITY_EXIT, 15, 20, 1},
+    {MAP_POINT, ENTITY_FOOD, 7, 23, 1},
+    {MAP_POINT, ENTITY_SPIKE, 11, 23, 1},
 };
 
-const EntityMap *Tiles[MAX_TILES] = {&Map01, &Map02, &Map03, &Map01};
+static const EntityMap level3 = {7, level3_tiles};
+
+static EntityDrawMap level4_tiles[] = {
+    {MAP_LINE_HORIZONTAL, ENTITY_PLATFORM, 7, 24, 6},
+    {MAP_POINT, ENTITY_EXIT, 12, 20, 1},
+    {MAP_POINT, ENTITY_SPIKE, 12, 23, 1},
+    {MAP_POINT, ENTITY_SNAKE, 10, 23, 1},
+    {MAP_POINT, ENTITY_ROCK, 11, 23, 1},
+};
+
+static const EntityMap level4 = {4, level4_tiles};
+
+const EntityMap *Tiles[MAX_TILES] = {&level1, &level2, &level3, &level4};
+
+#endif // ALL_MAPS_H
