@@ -1,18 +1,129 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Juego de Carreras Modular</title>
-    <style>
-        body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #222; }
-        canvas { border: 2px solid #fff; background-color: #87ceeb; }
-    </style>
+    <meta charset="UTF-8" />
+    <!--Para la Code-->
+    <script src="gamedev/codemirror.js"></script>
+    <script src="gamedev/javascript.js"></script>
+    <script src="gamedev/jshint.min.js"></script>
+    <script src="gamedev/lint.js"></script>
+    <script src="gamedev/javascript-lint.js"></script>
+    <link rel="stylesheet" href="gamedev/codemirror.css" />
+
+    <!--Para la APP-->
+    <link rel="stylesheet" href="style.css" />
+    <link rel="icon" href="favicon.png">
+    <title>Game Dev 🕹️</title>
 </head>
+
 <body>
-    <script  src="service/Engine.js"></script>
-    <script  src="game.js"></script>
-    <script  src="Main.js"></script>
+    <header class="navbar">
+        <details class="dropdown">
+            <summary class="dropbtn">Archivo</summary>
+            <ul class="dropdown-content hover">
+                <li id="newBtn">Nuevo</li>
+                <li id="openBtn">Abrir</li>
+                <li id="saveBtn">Guardar</li>
+                <li id="saveAsBtn">Guardar Como</li>
+            </ul>
+            <!--input type="file" id="fileInput" style="display:none" accept=".json" /-->
+        </details>
+        <details class="dropdown">
+            <summary class="dropbtn">Proyecto</summary>
+            <ul id="mapBtn" class="dropdown-content hover">
+                <li id="runBtn">Ejecutar</li>
+                <li id="exportGameBtn">Exportar Game</li>
+            </ul>
+        </details>
+        <span class="spacer"></span>
+        <details class="dropdown">
+            <summary class="dropbtn" style="width:50px">Sobre</summary>
+            <ul id="aboutBtn" class="dropdown-content">
+                <li id="contact">Ayuda</li>
+                <li id="contact">Salir</li>
+            </ul>
+        </details>
+
+    </header>
+    <section class="main">
+
+        <div class="tabs-container" style="height: 100%;">
+            <div class="tabs" id="tabs">
+                <div class="tab active" data-tag="#code">Code</div>
+                <div class="tab" data-tag="#sprite">Sprite</div>
+                <div class="tab" data-tag="#tile">Tile</div>
+                <div class="tab hidden">Sound</div>
+            </div>
+            <div class="tab-panel">
+
+                <div id="code" class="panel panel-grid">
+                    <textarea name="code"></textarea>
+                </div>
+
+                <div id="sprite" class="panel panel-grid ">
+                    <div class="flex flex-row border-bottom p-1">
+                        <div id="spriteEditor" class="grid" data-grid-w="8" data-grid-h="8" data-grid-pixel="16"></div>
+                        <div class="toolbar ms-2">
+                            <input type="color" list="colorList" value="#000000" id="color-picker" />
+                            <img src="ColorFriends.png" style="width: 128px;"/>
+                            <datalist id="colorList">
+                                <!-- GB Pocket
+                                    <option value="#000000">black </option>
+                                    <option value="#c0c0c0">silver </option>
+                                    <option value="#808080">gray </option>
+                                    <option value="#ffffff">white </option>
+                                -->
+                                <!-- PICO - 8-->
+                                <option value="#000000" data-index="0">black</option>
+                                <option value="#1D2B53" data-index="1">dark-blue</option>
+                                <option value="#7E2553" data-index="2">dark-purple</option>
+                                <option value="#008751" data-index="3">dark-green</option>
+                                <option value="#AB5236" data-index="4">brown</option>
+                                <option value="#5F574F" data-index="5">dark-grey</option>
+                                <option value="#C2C3C7" data-index="6">light-grey</option>
+                                <option value="#FFF1E8" data-index="7">white</option>
+                                <option value="#FF004D" data-index="8">red</option>
+                                <option value="#FFA300" data-index="9">orange</option>
+                                <option value="#FFEC27" data-index="A">yellow</option>
+                                <option value="#00E436" data-index="B">green</option>
+                                <option value="#29ADFF" data-index="C">blue</option>
+                                <option value="#83769C" data-index="D">lavander</option>
+                                <option value="#FF77A8" data-index="E">pink</option>
+                                <option value="#FFCCAA" data-index="F">light-peach</option>
+                                <!-- undocumented
+                                <option data-index="0" value="#291814">brownish-black</option>
+                                <option data-index="1" value="#111D35">darker-blue</option>
+                                <option data-index="2" value="#422136">darker-purple</option>
+                                <option data-index="3" value="#125359">blue-green</option>
+                                <option data-index="4" value="#742F29">dark-brown</option>
+                                <option data-index="5" value="#49333B">darker-grey</option>
+                                <option data-index="6" value="#A28879">medium-grey</option>
+                                <option data-index="7" value="#F3EF7D">light-yellow</option>
+                                <option data-index="8" value="#BE1250">dark-red</option>
+                                <option data-index="9" value="#FF6C24">dark-orange</option>
+                                <option data-index="A" value="#A8E72E">lime-green</option>
+                                <option data-index="B" value="#00B543">medium-green</option>
+                                <option data-index="C" value="#065AB5">true-blue</option>
+                                <option data-index="D" value="#754665">mauve</option>
+                                <option data-index="E" value="#FF6E59">dark-peach</option>
+                                <option data-index="F" value="#FF9D81">peach</option>
+                                 
+                                -->
+                            </datalist>
+                        </div>
+                    </div>
+                    <div id="spriteList" class="grid border" data-grid-w="16" data-grid-h="4" data-grid-pixel="8">
+                    </div>
+                </div>
+
+                <div id="tile" class="panel panel-grid">
+                    <div id="spriteList" class="grid border" data-grid-w="32" data-grid-h="8" data-grid-pixel="8">
+                </div>
+                <div id="sound" class="panel panel-grid">Sound</div>
+            </div>
+        </div>
+        <script src="script.js"></script>
 </body>
+
 </html>
-<!--file:///C:/Users/otavio.ferreira/Documents/Ludico/10-EngineGame/src/index.html-->
