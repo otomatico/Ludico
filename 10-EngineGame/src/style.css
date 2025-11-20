@@ -43,9 +43,8 @@ body {
 
 .spacer {
   width: 10px;
-  line-height: 28px;
   visibility: hidden;
-  margin: 0 auto;
+  margin-left:auto;
 }
 
 .dropdown summary {
@@ -53,6 +52,7 @@ body {
   padding: 3px 10px;
   cursor: pointer;
   user-select: none;
+  min-width: 60px;
 }
 
 .dropdown-content {
@@ -100,12 +100,15 @@ body {
   flex-direction: column;
   flex-wrap: nowrap;
 }
+
 .panel.show {
   display: flex !important;
 }
-.tab-panel > .panel {
+
+.tab-panel>.panel {
   display: none;
 }
+
 .panel-grid {
   width: 100%;
   height: 100%;
@@ -123,6 +126,7 @@ body {
   flex-direction: row;
   width: 100%;
 }
+
 .tab-panel {
   height: 100%;
 }
@@ -155,15 +159,19 @@ body {
   height: 100%;
   /*margin: -10px;*/
 }
+
 .flex {
   display: flex;
 }
+
 .flex-column {
   flex-direction: column;
 }
+
 .flex-row {
   flex-direction: row;
 }
+
 .grid {
   --w: attr(data-grid-w number, 0);
   --pixel: attr(data-grid-pixel px, 16px);
@@ -180,58 +188,85 @@ body {
   height: calc(var(--pixel));
   cursor: pointer;
 }
+
 #sprite {
   padding: 5px;
 }
+
 #spriteEditor .cell {
   /*background-color: attr(data-color, "#000");*/
   border: 1px solid var(--border-color);
 }
+
+#tileData.grid,
+#tileList.grid,
 #spriteList.grid {
   grid-template-columns: repeat(var(--w), calc(var(--pixel) * 3));
   gap: 1px;
-  column-gap:2px;
+  column-gap: 2px;
 }
+
 #spriteList .cell {
   width: calc(var(--pixel) * 3);
   height: calc(var(--pixel) * 3);
 }
+
+.cell.active,.cell.selected,
 #spriteList .cell:hover {
   border: 1px solid var(--active);
 }
+
+#tileList .cell,
+#tileData .cell {
+  width: calc(var(--pixel) * 3);
+  height: calc(var(--pixel) * 3);
+}
+
+
 .border {
   border: 1px solid var(--border-color);
 }
+
 .border-top {
   border-top: 1px solid var(--border-color);
 }
+
 .border-bottom {
   border-bottom: 1px solid var(--border-color);
 }
+
 .border-right {
   border-right: 1px solid var(--border-color);
 }
+
 .border-left {
   border-left: 1px solid var(--border-color);
 }
+
 .p-1 {
   padding: var(--p);
 }
+
 .p-2 {
   padding: calc(var(--p) * 2);
 }
+
 .p-3 {
   padding: calc(var(--p) * 3);
 }
+
 .p-4 {
   padding: calc(var(--p) * 4);
 }
+
 .p-5 {
   padding: calc(var(--p) * 5);
 }
+
 .mt-1 {
   margin-top: var(--p);
 }
+
 .mt-2 {
   margin-top: calc(var(--p) * 2);
 }
@@ -239,6 +274,7 @@ body {
 .ms-1 {
   margin-left: var(--p);
 }
+
 .ms-2 {
   margin-left: calc(var(--p) * 2);
 }
@@ -246,6 +282,7 @@ body {
 .me-1 {
   margin-right: var(--p);
 }
+
 .me-2 {
   margin-right: calc(var(--p) * 2);
 }
