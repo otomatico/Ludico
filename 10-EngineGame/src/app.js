@@ -82,6 +82,7 @@ export async function bootstrap() {
   });
   bus.on('navbar:click', ({ id, label, action }) => {
     alert(`⚠️ Funcionalidad de ${label} no fue implementada aún.`);
+    console.log(`Error :[${ id}, ${ label}, ${action }]`)
   });
 
   const fileMenu = {
@@ -89,16 +90,7 @@ export async function bootstrap() {
     items: [
       // Asignar funciones de fileHandler directamente a la clave 'action'
       { id: 'newBtn', label: 'Nuevo', action: () => fileHandler.newFile() },
-      // Modificar el openBtn para usar el fileHandler.uploadFile
-      {
-        id: 'openBtn', label: 'Abrir', action: () => {
-          const fileInput = document.createElement('input');
-          fileInput.type = 'file';
-          fileInput.accept = '.json';
-          fileInput.onchange = (e) => fileHandler.uploadFile(e.target.files[0]);
-          fileInput.click();
-        }
-      },
+      { id: 'openBtn', label: 'Abrir', action: async() => await fileHandler.openFile() },
       { id: 'saveBtn', label: 'Guardar', action: () => fileHandler.saveFile() },
       { id: 'saveAsBtn', label: 'Guardar Como', action: () => fileHandler.saveAs() },
     ]
@@ -106,8 +98,8 @@ export async function bootstrap() {
   const projectMenu = {
     label: 'Proyecto',
     items: [
-      { id: 'runBtn', label: 'Ejecutar', /* action: () => noImplementado()  */ },
-      { id: 'exportGameBtn', label: 'Exportar Game', /* action: () => noImplementado()  */ },
+      { id: 'runBtn', label: 'Ejecutar', },
+      { id: 'exportGameBtn', label: 'Exportar Game',},
     ]
   }
   const paletteMenu = {

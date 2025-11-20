@@ -1,3 +1,11 @@
+const opts = {
+  suggestedName: name,
+  types: [{
+    description: 'Archivo de Proyecto',
+    accept: { 'application/json': ['.json'] },
+  }],
+};
+
 export class FileHandler {
   constructor(store, bus) {
     this.store = store; this.bus = bus;
@@ -17,27 +25,29 @@ export class FileHandler {
     this.store.set(state);
     this.bus.emit('project:loaded', state);
   }
+  async openFile() {
+    let [handler] = await window.showOpenFilePicker(opts)
+    let fileData = await handler.getFile();
+    let payload = await fileData.text();
+    payload = JSON.parse(payload)
+    this.store.set(payload);
+    this.bus.emit('project:loaded', payload);
+  }
 
-  saveAs(promptFn = prompt) {
-    const name = promptFn('Nombre del Proyecto');
-    if (!name) return;
-    const s = this.store.get();
-    this.store.set({ filename: name });
-    this.saveFile();
+  async saveAs() {
+    let handle = await window.showSaveFilePicker(opts);
+
+    let fileData = await handle.getFile();
+    let writable = await handle.createWritable();
+    this.store.set({ filename: fileData.name });
+
+    await writable.write(this._payload_text());
+    await writable.close();
   }
 
   saveFile() {
     const s = this.store.get();
-    const filename = s.filename;
-    const payload = {
-      filename: s.filename,
-      paletteName: s.paletteName || 'DEFAULT',
-      palette: s.palette || [],
-      gfx: s.gfx,
-      code: s.code,
-      tiles: s.tiles,
-    };
-    this.download(filename, JSON.stringify(payload));
+    this.download(s.filename, this._payload_text());
   }
 
   download(filename, content) {
@@ -48,12 +58,40 @@ export class FileHandler {
     URL.revokeObjectURL(url);
   }
 
+  _payload() {
+    const s = this.store.get();
+    return {
+      filename: s.filename,
+      paletteName: s.paletteName || 'DEFAULT',
+      palette: s.palette || [],
+      gfx: s.gfx,
+      code: s.code,
+      tiles: s.tiles,
+    };
+  }
+  _payload_text() {
+    const s = this.store.get();
+    return `{
+      "filename": "${s.filename}",
+      "paletteName": "${s.paletteName || 'DEFAULT'}",
+      "palette": ${JSON.stringify(s.palette || [])},
+      "gfx": [
+        ${s.gfx.map(m=>JSON.stringify(m)).join(',\n\t\t\t\t')}
+      ],
+      "code": ${JSON.stringify(s.code)},
+      "tiles": [
+        ${s.tiles.map(t=>JSON.stringify(t)).join(',\n\t\t\t\t')}
+      ]
+}`;
+  }
+}
+/*
   uploadFile(file) {
     const reader = new FileReader();
     reader.onload = (evt) => {
       try {
         const obj = JSON.parse(evt.target.result);
-        const state = { ...this.store.get(), ...obj/* gfx: obj.gfx, tiles: obj.tiles, code: obj.code  */ };
+        const state = { ...this.store.get(), ...obj};
         state.filename = file.name;
         this.store.set(state);
         this.bus.emit('project:loaded', state);
@@ -63,5 +101,5 @@ export class FileHandler {
     };
     reader.readAsText(file);
   }
-}
+  */
 
