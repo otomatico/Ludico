@@ -30,17 +30,22 @@ const PALETTES = {
 };
 
 export class ColorPickerComponent extends UIComponent {
-  constructor(selector = '#color-picker') {
+  constructor(selector = '#color-picker', opts = {}) {
     super(selector);
 
     // Almacenamos todas las paletas
     this.palettes = PALETTES;
     this.currentPaletteName = 'DEFAULT';
-
+    this.bus = opts.bus;
     // Inicializar con la paleta por defecto
     this.colors = this.palettes['DEFAULT'];
-  }
 
+    this.on("change",(e)=>{
+        const color = this.getColor();
+        const index =this.toId(color);
+        this.bus.emit("paint:color", {color,index});
+    })
+  }
 
   setPalette(name) {
     const newColors = this.palettes[name.toUpperCase()];

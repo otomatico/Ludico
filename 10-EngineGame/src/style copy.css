@@ -11,6 +11,13 @@
   --active-rgb: 0, 120, 212;
   --muted: #9aa0a6;
   --fg: #ffffff;
+  --ENTITY_NONE: #333333;
+  --ENTITY_SNAKE: #4caf50;
+  --ENTITY_FOOD: #ff5252;
+  --ENTITY_PLATFORM: #9e9e9e;
+  --ENTITY_ROCK: #795548;
+  --ENTITY_SPIKE: #ffc107;
+  --ENTITY_EXIT: #00bcd4;
   --p: 4px;
 }
 
@@ -37,7 +44,7 @@ body {
 .spacer {
   width: 10px;
   visibility: hidden;
-  margin-left: auto;
+  margin-left:auto;
 }
 
 .dropdown summary {
@@ -105,6 +112,7 @@ body {
 .panel-grid {
   width: 100%;
   height: 100%;
+  /*padding: 10px;*/
 }
 
 .tabs-container {
@@ -149,6 +157,7 @@ body {
 .CodeMirror {
   width: 100%;
   height: 100%;
+  /*margin: -10px;*/
 }
 
 .flex {
@@ -180,19 +189,6 @@ body {
   cursor: pointer;
 }
 
-.drawSprite {
-  /*flex flex-row border-bottom p-1*/
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  border-bottom: 1px solid var(--border-color);
-  padding: var(--p);
-}
-
-#toolSize {
-  color: var(--fg);
-}
-
 #sprite {
   padding: 5px;
 }
@@ -200,22 +196,6 @@ body {
 #spriteEditor .cell {
   /*background-color: attr(data-color, "#000");*/
   border: 1px solid var(--border-color);
-}
-
-.toolbox {
-  display: flex;
-  flex-wrap: wrap;
-  width: 120px;
-  font-size: 24px;
-  gap: 4px;
-}
-
-.toolbox label {
-  border: 1px solid var(--border-color);
-  background-color: var(--panel);
-  width: 40px;
-  /*   margin: 2px;
-  padding: 2px; */
 }
 
 #tileData.grid,
@@ -231,8 +211,7 @@ body {
   height: calc(var(--pixel) * 3);
 }
 
-.cell.active,
-.cell.selected,
+.cell.active,.cell.selected,
 #spriteList .cell:hover {
   border: 1px solid var(--active);
 }
@@ -243,72 +222,7 @@ body {
   height: calc(var(--pixel) * 3);
 }
 
-[for=color-picker] {
-  background-color: transparent;
-  height: 40px;
-}
 
-[for=color-picker] span {
-  position: relative;
-  top: -45px;
-  left: 4px;
-}
-
-#color-picker {
-  overflow: hidden;
-  --size: 40px;
-
-  width: var(--size);
-  height: var(--size);
-  background: none;
-  padding: 0;
-  border: 0;
-
-
-  &::-webkit-color-swatch-wrapper {
-    width: var(--size);
-    height: var(--size);
-    padding: 0;
-  }
-
-  &::-webkit-color-swatch {
-    /*
-    border: 0px solid #333;
-     border-radius: 50%; 
-     */
-  }
-}
-
-*[title] {
-  content: attr(title);
-  background-color: var(--mute);
-  border: 1px solid var(--border-color);
-}
-
-*[title]:hover {
-  visibility: visible;
-  opacity: 1;
-}
-
-*[title]::after {
-  visibility: hidden;
-  width: 120px;
-  background-color: #000;
-  color: #fff;
-  text-align: center;
-  border-radius: 6px;
-  padding: 5px;
-  position: absolute;
-  z-index: 1;
-  bottom: 125%;
-  /* Posiciona el tooltip encima del elemento */
-  left: 50%;
-  transform: translateX(-50%);
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-/**********************************************************************************************/
 .border {
   border: 1px solid var(--border-color);
 }

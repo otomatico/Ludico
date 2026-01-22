@@ -50,16 +50,17 @@ class Engine {
     this.#palette[id % 4] = [...palette];
   }
 
-  Draw(id, x, y, w, h, pal = 0) {
-    const startX = (id % 16) * 8;
-    const startY = parseInt(id / 16) * 8;
-    for (let row = 0; row < 8 * h; row++) {
-      for (let col = 0; col < 8 * w; col++) {
-        let color = this.#gfx[row + startY][col + startX];
-        this.#ctx.fillStyle = this.#palette[pal % 4][color % 16];
+  Draw(id, x, y, pal = 0) {
+    const sprite = this.#gfx[id];
+    const palette =this.#palette[pal % 4]
+    const paletteMax = palette.length
+    for (let row = 0; row < 8; row++) {
+      for (let col = 0; col < 8; col++) {
+        let color = sprite[row ][col];
+        this.#ctx.fillStyle = palette[color % paletteMax];
         this.#ctx.fillRect(
-          (x + col) * this.sizePixel,
-          (y + row) * this.sizePixel,
+          x + (col * this.sizePixel),
+          y + (row * this.sizePixel),
           this.sizePixel,
           this.sizePixel
         );
@@ -87,35 +88,3 @@ const paletteDefault = [
   "#191919",
   "#000000",
 ];
-/*
-Blanco Humo (White Smoke)	#F5F5F5
-Gris Gema (Gainsboro)	#DCDCDC
-Gris Claro (Light Gray)	#D3D3D3
-Plata (Silver)	#C0C0C0
-Gris Ceniza (Light Slate Gray)	#778899
-Gris Medio (Medium Gray)	#BEBEBE
-Gris Pálido (Dark Gray)	#A9A9A9
-Gris Topo (Taupe Gray)	#8B8887
-Gris (Gray)	#808080
-Gris Cadete (Cadet Gray)	#5F9EA0
-Gris Pizarra (Slate Gray)	#708090
-Gris Oscuro (Dim Gray)	#696969
-Gris Plomo (Dark Slate Gray)	#2F4F4F
-Gris Carbón (Charcoal Gray)	#333333
-Gris Medianoche (Midnight Gray)	#191970
-Negro (Black)	#000000
-*/
-
-/*
-  collide(other) {
-    const x1 = this.position.x;
-    const y1 = this.position.y;
-    const w1 = this.size.w;
-    const h1 = this.size.h;
-    const x2 = other.position.x;
-    const y2 = other.position.y;
-    const w2 = other.size.w;
-    const h2 = other.size.h;
-    return x1 < x2 + w2 && x1 + w1 > x2 && y1 < y2 + h2 && h1 + y1 > y2;
-  }
-*/

@@ -5,6 +5,7 @@ import { TabComponent } from './components/tabs.js';
 import { NavBarComponent } from './components/navbar-component.js';
 import { TilesComponent } from './components/tile-component.js';
 import { SpriteEditorComponent } from './components/sprite-editor-component.js';
+import { SpriteEditorToolbar } from './components/sprite-editor-toolbar-component.js';
 import { SpriteListComponent } from './components/sprite-list-component.js';
 import { CodeMirrorComponentFactory } from './utils/codemirror-wrapper.js';
 import { FileHandler } from './utils/file-handler.js';
@@ -17,12 +18,13 @@ export async function bootstrap() {
   const fileHandler = new FileHandler(store, bus);
 
   // components
-  const ColorPicker = new ColorPickerComponent('#color-picker');
-  const Tabs = new TabComponent('.tabs-container');
   const Navbar = new NavBarComponent('.navbar', bus);
-  const Tile = new TilesComponent('#tile', { store, bus });
-  const SpriteEditor = new SpriteEditorComponent('#spriteEditor', { colorPicker: ColorPicker, store, bus });
+  const Tabs = new TabComponent('.tabs-container');
+  const ColorPicker = new ColorPickerComponent('#color-picker', { bus });
+  const SpriteEditor = new SpriteEditorComponent('#spriteEditor', { store, bus });
   const SpriteList = new SpriteListComponent('#spriteList', { store, bus });
+  const spriteToolbar = new SpriteEditorToolbar('#spriteToolbar', { bus });
+  const Tile = new TilesComponent('#tile', { store, bus });
 
   // CodeMirror
   const textarea = document.querySelector('textarea[name="code"]');
@@ -30,10 +32,20 @@ export async function bootstrap() {
   if (textarea && window.CodeMirror) {
     editor = CodeMirrorComponentFactory(textarea, (code) => store.set({ code }));
   }
-  // bind store Suscripción
-  // Suscripción a 'gfx' para la actualizacion de sprite
+  // bind
+  const colorLookup = (i) => ColorPicker.toColor(i);
+
+  // Reactivos
+  // 'tiles' para que el mapa se actualice
+  store.subscribe('tiles', (tiles, state) => {
+    Tile.drawMap(tiles, state.gfx, colorLookup);
+  });
+  // Oye he cambiado el spriteId
+  store.subscribe('spriteId', (spriteId, state) => {
+    SpriteEditor.loadSprite(spriteId, state.gfx, colorLookup);
+  });
+  //hay cambio en "todo"
   store.subscribe('gfx', (gfx, state) => {
-    const colorLookup = (i) => ColorPicker.toColor(i);
     const spriteId = state.spriteId || 0;
     Tile.attachData({ gfx, colorLookup });
     Tile.drawMap(state.tiles, state.gfx, colorLookup);
@@ -41,24 +53,23 @@ export async function bootstrap() {
     SpriteEditor.loadSprite(spriteId, gfx, colorLookup);
   });
 
-  // Suscripción a 'tiles' para que el mapa se actualice
-  store.subscribe('tiles', (tiles, state) => {
-    Tile.drawMap(tiles, state.gfx, (i) => ColorPicker.toColor(i));
+  //Subscribe al bus
+  //he cambiado el color
+  bus.on('paint:color', ({ color, index }) => {
+    SpriteEditor.setColor(color, index)
   });
-
-  store.subscribe('spriteId', (spriteId, state) => {
-    SpriteEditor.loadSprite(spriteId, state.gfx, (i) => ColorPicker.toColor(i));
+  //he cambiado el "pincel"
+  bus.on('paint:tool', ({ tool }) => {
+    SpriteEditor.setTool(tool);
   });
-
+  //he cambiado el Grosor del pincel
+  bus.on('paint:thickness', ({ size }) => {
+    SpriteEditor.setThickness(size)
+  });
+  //Alguien cambió el spriteId
   bus.on('sprite:selected', ({ spriteId }) => {
     store.set({ spriteId: spriteId });
   });
-  /*
-    bus.on('sprite:modified', ({ id }) => {
-      const state = store.get();
-      // Redibujar la celda de la lista de sprites
-      SpriteList.drawCell(id, state.gfx, (i) => ColorPicker.toColor(i));
-    });*/
 
   bus.on('project:loaded', (state) => {
     const colorLookup = (i) => ColorPicker.toColor(i);
@@ -80,9 +91,10 @@ export async function bootstrap() {
     SpriteList.drawAll(state.gfx, colorLookup);
     SpriteEditor.loadSprite(state.spriteList || 0, state.gfx, colorLookup);
   });
+
   bus.on('navbar:click', ({ id, label, action }) => {
     alert(`⚠️ Funcionalidad de ${label} no fue implementada aún.`);
-    console.log(`Error :[${ id}, ${ label}, ${action }]`)
+    console.log(`Error :[${id}, ${label}, ${action}]`)
   });
 
   const fileMenu = {
@@ -90,7 +102,7 @@ export async function bootstrap() {
     items: [
       // Asignar funciones de fileHandler directamente a la clave 'action'
       { id: 'newBtn', label: 'Nuevo', action: () => fileHandler.newFile() },
-      { id: 'openBtn', label: 'Abrir', action: async() => await fileHandler.openFile() },
+      { id: 'openBtn', label: 'Abrir', action: async () => await fileHandler.openFile() },
       { id: 'saveBtn', label: 'Guardar', action: () => fileHandler.saveFile() },
       { id: 'saveAsBtn', label: 'Guardar Como', action: () => fileHandler.saveAs() },
     ]
@@ -99,7 +111,7 @@ export async function bootstrap() {
     label: 'Proyecto',
     items: [
       { id: 'runBtn', label: 'Ejecutar', },
-      { id: 'exportGameBtn', label: 'Exportar Game',},
+      { id: 'exportGameBtn', label: 'Exportar Game', },
     ]
   }
   const paletteMenu = {

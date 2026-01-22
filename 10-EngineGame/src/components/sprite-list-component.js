@@ -6,7 +6,7 @@ export class SpriteListComponent extends UIComponent {
     super(selector);
     this.opts = opts; // { bus, store }
     Renderer.createGrid(this.dom, +this.dom.dataset.gridW || 16, +this.dom.dataset.gridH || 4, +this.dom.dataset.gridPixel || 8);
-
+    
     this.on('click', (e) => {
       const target = e.target;
       if (target.tagName === 'CANVAS' || target.classList.contains('cell')) {
@@ -14,8 +14,11 @@ export class SpriteListComponent extends UIComponent {
         const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
         const spriteId = +target.dataset.y * (+this.dom.dataset.gridW || 16) + (+target.dataset.x || 0);
         this.opts.bus.emit('sprite:selected', { spriteId, imageData });
+        this.$(".active")?.classList?.remove("active")
+        target.classList.add("active")
       }
     });
+    this.$(".cell")?.click();
   }
 
   // dibuja una celda individual a partir de gfx
