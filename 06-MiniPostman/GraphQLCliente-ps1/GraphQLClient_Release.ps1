@@ -15,8 +15,7 @@ $headerRows = New-Object System.Collections.Generic.List[Object]
 # --- Funciones de Lógica ---
 
 function Add-HeaderRow {
-    param($Key = "", $Value = "")
-    
+    param($Key = "", $Value = "")    
     $panel = New-Object System.Windows.Forms.Panel
     $panel.Size = New-Object System.Drawing.Size(660, 35)
     $panel.Margin = New-Object System.Windows.Forms.Padding(0)
@@ -37,7 +36,9 @@ function Add-HeaderRow {
     $btnDel.Size = New-Object System.Drawing.Size(30, 20)
     $btnDel.BackColor = [System.Drawing.ColorTranslator]::FromHtml("#dc3545");
     $btnDel.ForeColor = [System.Drawing.Color]::White
+    
     $rowObj = [PSCustomObject]@{ Panel = $panel; Key = $txtKey; Val = $txtVal }
+
 	# TRUCO: Guardamos la referencia del objeto en la propiedad .Tag del botón
 	$btnDel.Tag = $rowObj
 
@@ -51,17 +52,14 @@ function Add-HeaderRow {
         
         # 2. Eliminar de la lista lógica (usando la referencia guardada)
         # Usamos $script: para asegurar que afectamos a la lista del ámbito superior
-        $script:headerRows.Remove($currentRow) | Out-Null
-        
+        $script.headerRows.Remove($currentRow) | Out-Null        
     })
-
     $panel.Controls.Add($txtKey)
     $panel.Controls.Add($txtVal)
     $panel.Controls.Add($btnDel)
     
     $flowHeaders.Controls.Add($panel)
-    
-    
+
     $script:headerRows.Add($rowObj)
 }
 
@@ -91,7 +89,7 @@ function Execute-Request {
 
         # Protocolo de Seguridad
         [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-
+        Write-Host $headers.Values
         $response = Invoke-RestMethod @params
         $outputBox.ForeColor = [System.Drawing.Color]::White
         $outputBox.Text = $response | ConvertTo-Json -Depth 10
@@ -235,6 +233,6 @@ $outputBox.ScrollBars = "Both"
 $mainContainer.Controls.Add($outputBox)
 
 # Iniciar con una fila de header
-Add-HeaderRow "Content-Type" "application/json"
+Add-HeaderRow "x-user" ""
 
 $form.ShowDialog()

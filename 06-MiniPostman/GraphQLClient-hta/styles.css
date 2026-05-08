@@ -1,0 +1,298 @@
+/* RESET & BASE */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background: #e0e0e0;
+    overflow-x: hidden;
+    font-size: 0.9em;
+    height: 100%;
+    margin: 0;
+}
+
+/* BARRA DE MENÚ SUPERIOR */
+.menu-bar {
+    background: #f0f0f0;
+    font-size: 0.6em;
+    border-bottom: 1px solid #ababab;
+    padding: 2px 10px;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+.menu-item {
+    display: inline-block;
+    padding: 4px 12px;
+    color: #333;
+    cursor: pointer;
+    position: relative;
+}
+
+.menu-item:hover {
+    background: #d1d1d1;
+}
+
+.menu-item span {
+    font-weight: bold;
+}
+
+.menu-group {
+    display: inline-block;
+    position: relative;
+}
+
+.menu-button {
+    padding: 6px 15px;
+    cursor: pointer;
+    background: #f0f0f0;
+    border: none;
+    font-size: 1.2em;
+}
+
+.menu-button:hover {
+    background: #d1d1d1;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    border: 1px solid #ccc;
+    z-index: 1001;
+}
+
+.dropdown-content div {
+    color: black;
+    padding: 8px 12px;
+    text-decoration: none;
+    display: block;
+    cursor: pointer;
+}
+
+.dropdown-content div:hover {
+    background-color: #e0e0e0;
+}
+
+.show {
+    display: block;
+}
+
+/* CONTENEDOR PRINCIPAL Y PESTAÑAS */
+.tabs-container {
+    width: 100%;
+    height: calc(100% - 30px);
+    display: table;
+    table-layout: fixed;
+    margin-top: 30px;
+}
+
+.tabs-header {
+    display: table-row;
+    height: 30px;
+    background: #f0f0f0;
+    border-bottom: 1px solid #ababab;
+    overflow: hidden;
+}
+
+.tab-add-button {
+    float: left;
+    width: 30px;
+    height: 28px;
+    background: #f0f0f0;
+    border: 1px solid #ababab;
+    border-bottom: none;
+    text-align: center;
+    line-height: 28px;
+    cursor: pointer;
+    font-weight: bold;
+    color: #666;
+}
+
+.tab-add-button:hover {
+    background: #d1d1d1;
+}
+
+.tab-button {
+    float: left;
+    padding: 6px 12px;
+    height: 30px;
+    cursor: pointer;
+    border: 1px solid #ababab;
+    border-bottom: none;
+    margin-right: -1px;
+    background: #e0e0e0;
+    font-weight: bold;
+    font-size: 0.9em;
+    text-align: center;
+    position: relative;
+}
+
+.tab-button:hover {
+    background: #d1d1d1;
+}
+
+.tab-button.active {
+    background: #f0f0f0;
+    /*border-bottom: 1px solid white;*/
+    margin-bottom: -1px;
+}
+
+.tab-button .tab-close {
+    margin-left: 8px;
+    color: #666;
+    font-size: 0.8em;
+    cursor: pointer;
+}
+
+.tab-button .tab-close:hover {
+    color: #000;
+}
+
+.tabs-content {
+    display: table-row;
+    height: calc(100% - 30px);
+    overflow: hidden;
+}
+
+.tab-pane {
+    display: none;
+    width: 100%;
+    height: 100%;
+    background: #f0f0f0;
+    overflow-y: auto;
+}
+
+.tab-pane.active {
+    display: block;
+}
+
+/* ESTILOS DENTRO DE CADA PESTAÑA */
+.tab-pane .main-wrapper {
+    padding: 10px;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+.tab-pane .container {
+    background: white;
+    padding: 15px;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    height: 100%;
+    overflow-y: auto;
+}
+
+label {
+    font-weight: bold;
+    display: block;
+    margin-top: 12px;
+    font-size: 0.9em;
+    color: #444;
+}
+
+input, textarea, select {
+    width: 100%;
+    padding: 6px;
+    border: 1px solid #ccc;
+    border-radius: 2px;
+    box-sizing: border-box;
+}
+
+textarea {
+    height: 120px;
+    font-family: 'Consolas', monospace;
+    resize: none;
+    margin-top: 5px;
+}
+
+.placeholder-style {
+    color: #aaa !important;
+}
+
+/* TABLAS DE LAYOUT (IE9 COMPATIBLE) */
+.row-table {
+    display: table;
+    width: 100%;
+    border-spacing: 5px 0;
+    margin-bottom: 5px;
+}
+
+.cell {
+    display: table-cell;
+    vertical-align: bottom;
+}
+
+#headers-container {
+    margin-top: 5px;
+    border: 1px solid #eee;
+    padding: 8px;
+    background: #fafafa;
+}
+
+.header-row {
+    display: table;
+    width: 100%;
+    border-spacing: 5px;
+    margin-bottom: 2px;
+}
+
+/* BOTONES */
+.btn {
+    padding: 6px 12px;
+    background-color: #666;
+    color: white;
+    border: 1px solid #555;
+    border-radius: 2px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.85em;
+}
+
+.btn:hover {
+    background-color: #888;
+}
+
+.btn-execute {
+    background-color: #0078d4;
+    border-color: #005a9e;
+    width: 100%;
+    height: 35px;
+}
+
+.btn-execute:hover {
+    background-color: #005a9e;
+}
+
+.btn-add {
+    background-color: #28a745;
+    margin-top: 5px;
+}
+
+.btn-del {
+    background-color: #dc3545;
+    width: 40px;
+    text-align: center;
+}
+
+/* PANEL DE SALIDA */
+.output-panel {
+    margin-top: 15px;
+    font-size: 0.85em;
+    white-space: pre-wrap;
+    font-family: 'Consolas', monospace;
+    background: #1e1e1e;
+    color: #dcdcdc;
+    padding: 15px;
+    border-radius: 2px;
+    height: 200px;
+    overflow-y: auto;
+    border: 1px solid #000;
+}

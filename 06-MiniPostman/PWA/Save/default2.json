@@ -1,0 +1,11 @@
+{
+  "url": "https://jsonplaceholder.typicode.com/posts",
+  "method": "POST",
+  "body": "{\n  \"title\": \"foo\",\n  \"body\": \"bar\",\n  \"userId\": 1\n}",
+  "headers": [
+                    {
+                        "key":  "Content-Type",
+                        "val":  "application/json"
+                    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "url": "http://localhost:8080/api/graphql",
+  "method": "POST",
+  "body": "",
+  "headers": [
+    {
+      "key": "Content-Type",
+      "val": "application/json"
+    },
+    {
+      "key": "x-user",
+      "val": "ezh="
+    }
+  ]
+}

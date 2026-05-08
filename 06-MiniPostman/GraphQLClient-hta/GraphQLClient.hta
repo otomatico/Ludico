@@ -1,0 +1,48 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="x-ua-compatible" content="ie=9">
+    <title>REST API Client</title>
+    <hta:application
+        id="oAppRestApi"
+        applicationname="GraphQLClient"
+        border="thin"
+        scroll="auto"
+        singleinstance="yes"
+        width="750"
+        height="850"
+        icon="icon.ico"
+    >
+    <!-- Estilos externos -->
+    <link rel="stylesheet" type="text/css" href="styles.css">
+
+    <!-- Scripts externos -->
+    <script language="jscript" src="script.js"></script>
+</head>
+
+<body>
+    <!-- Barra de menú -->
+    <div class="menu-bar">
+        <div class="menu-group">
+            <button class="menu-button" onclick="toggleMenu()">Archivo</button>
+            <div id="fileMenu" class="dropdown-content">
+                <div onclick="LoadConfig(); toggleMenu();">Abrir Configuración</div>
+                <div onclick="SaveConfig(); toggleMenu();">Guardar Configuración</div>
+                <div style="border-top: 1px solid #ccc;" onclick="window.location.reload()">Reiniciar</div>
+                <div onclick="window.close()">Salir</div>
+            </div>
+        </div>
+        <div class="menu-item" style="float:right; font-size: 12px; color: #888;">v1.0.0</div>
+    </div>
+
+    <!-- Contenedor de pestañas -->
+    <div class="tabs-container">
+        <div class="tabs-header">
+            <div class="tab-add-button" onclick="addNewTab()">+</div>
+        </div>
+        <div class="tabs-content">
+            <!-- Las pestañas se añadirán aquí dinámicamente -->
+        </div>
+    </div>
+</body>
+</html>
