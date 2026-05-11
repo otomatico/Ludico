@@ -1,26 +1,127 @@
-// ======================
-// OBJETO PARA MANEJAR PESTAÑAS
-// ======================
-const TabManager = {
-    tabCounter: 0,
+class Tab_Manager {
+    constructor() {
+        this.tabCounter = 0;
+        this.headerManager = new TabHeader_Manager();
+        this.contentManager = new TabContent_Manager();
+        this.setupEventListeners();
+    }
+
+    // Configura los event listeners
+    setupEventListeners() {
+        // Delegación de eventos para los botones de pestañas
+        const tabsHeader = document.querySelector(".tabs-header");
+        tabsHeader.addEventListener("click", (event) => {
+            const tabButton = event.target.closest(".tab-button");
+            if (tabButton) {
+                const tabId = tabButton.id;
+                const paneId = `pane-${tabId.replace("tab-", "")}`;
+                this.switchTab(tabId, paneId);
+            }
+
+            // Manejar el cierre de pestañas
+            const closeButton = event.target.closest(".tab-close");
+            if (closeButton) {
+                event.stopPropagation();
+                const tabButton = closeButton.parentElement;
+                const tabId = tabButton.id;
+                const paneId = `pane-${tabId.replace("tab-", "")}`;
+                this.closeTab(tabId, paneId);
+            }
+        });
+    }
 
     // Añade una nueva pestaña
-    addNewTab() {
+    addNewTab(tabText = null) {
         this.tabCounter++;
         const tabId = `tab-${this.tabCounter}`;
         const paneId = `pane-${this.tabCounter}`;
+        if (tabText == null) {
+            tabText = prompt("Nombre de la Nueva Pestaña", `Peticion ${this.tabCounter}`);
+        }
+        this.headerManager.createTabHeader(tabId, tabText);
+        this.contentManager.createTabPane(tabId, paneId);
+        this.switchTab(tabId, paneId); // Activar la nueva pestaña
+    }
 
-        const tabsHeader = document.querySelector(".tabs-header");
-        const tabsContent = document.querySelector(".tabs-content");
+    // Cierra una pestaña
+    closeTab(tabId, paneId) {
+        if (document.querySelectorAll(".tab-button").length <= 1) {
+            alert("No puedes cerrar la última pestaña.");
+            return;
+        }
 
-        // Crear botón de pestaña
+        this.headerManager.removeTab(tabId);
+        this.contentManager.removePane(paneId);
+
+        // Activar la primera pestaña restante
+        const firstTabButton = document.querySelector(".tab-button");
+        if (firstTabButton) {
+            const firstTabId = firstTabButton.id;
+            const firstPaneId = `pane-${firstTabId.replace("tab-", "")}`;
+            this.switchTab(firstTabId, firstPaneId);
+        }
+    }
+
+    // Cambia entre pestañas
+    switchTab(tabId, paneId) {
+        // Desactivar todas las pestañas y paneles
+        document.querySelectorAll(".tab-button").forEach(tab => {
+            tab.classList.remove("active");
+        });
+        document.querySelectorAll(".tab-pane").forEach(pane => {
+            pane.classList.remove("active");
+        });
+
+        // Activar la pestaña y panel seleccionados
+        document.getElementById(tabId).classList.add("active");
+        document.getElementById(paneId).classList.add("active");
+    }
+
+    // Obtiene la configuración de una pestaña
+    getTabConfig(tabId) {
+        return this.contentManager.getTabConfig(tabId);
+    }
+
+    // Carga la configuración en una pestaña
+    loadConfigToTab(tabId, data) {
+        this.contentManager.loadConfigToTab(tabId, data);
+    }
+}
+
+class TabHeader_Manager {
+    constructor() {
+        this.tabsHeader = document.querySelector(".tabs-header");
+    }
+
+    // Añade una nueva pestaña
+    createTabHeader(tabId, tabText) {
+        const tabButton = this.createTabButton(tabId, tabText);
+        this.tabsHeader.insertBefore(tabButton, this.tabsHeader.lastChild);
+    }
+
+    // Crea el botón de una pestaña
+    createTabButton(tabId, tabText) {
         const tabButton = document.createElement("div");
         tabButton.id = tabId;
         tabButton.className = "tab-button";
-        tabButton.innerHTML = `Petición ${this.tabCounter}<span class="tab-close" onclick="event.stopPropagation(); TabManager.closeTab('${tabId}', '${paneId}')">x</span>`;
-        tabButton.addEventListener('click', () => this.switchTab(tabId, paneId));
+        tabButton.innerHTML = `${tabText}<span class="tab-close">x</span>`;
+        return tabButton;
+    }
 
-        // Crear panel de pestaña
+    // Elimina un botón de pestaña
+    removeTab(tabId) {
+        const tabButton = document.getElementById(tabId);
+        if (tabButton) tabButton.remove();
+    }
+}
+
+class TabContent_Manager {
+    constructor() {
+        this.tabsContent = document.querySelector(".tabs-content");
+    }
+
+    // Crea el panel de una pestaña
+    createTabPane(tabId, paneId) {
         const tabPane = document.createElement("div");
         tabPane.id = paneId;
         tabPane.className = "tab-pane";
@@ -44,12 +145,12 @@ const TabManager = {
                             <input type="text" id="url-${tabId}" value="http://localhost:8080/api/graphql" placeholder="URL de la API">
                         </div>
                         <div class="cell" style="flex:none">
-                            <button class="btn btn-execute" onclick="event.stopPropagation(); RequestManager.executeRequest('${tabId}')">Enviar</button>
+                            <button class="btn btn-execute" id="execute-${tabId}">Enviar</button>
                         </div>
                     </div>
                     <label>Headers de la Petición:</label>
                     <div id="headers-container-${tabId}"></div>
-                    <button class="btn btn-add" onclick="event.stopPropagation(); TabManager.addHeaderRow('${tabId}', '', '')">+ Añadir Cabecera</button>
+                    <button class="btn btn-add" id="add-header-${tabId}">+ Añadir Cabecera</button>
                     <label for="body-${tabId}">Cuerpo de la Petición (Body/Query):</label>
                     <textarea id="body-${tabId}" placeholder='{"query": "{ ... }"}'></textarea>
                 </div>
@@ -59,58 +160,38 @@ const TabManager = {
             </div>
         `;
 
-        // Añadir al DOM
-        tabsHeader.insertBefore(tabButton, tabsHeader.lastChild);
-        tabsContent.appendChild(tabPane);
+        // Evento para ejecutar la petición
+        const executeButton = tabPane.querySelector(`#execute-${tabId}`);
+        executeButton.addEventListener("click", (event) => {
+            event.stopPropagation();
+            RequestManager.executeRequest(tabId);
+        });
 
-        // Activar la nueva pestaña
-        this.switchTab(tabId, paneId);
+        // Evento para añadir una cabecera
+        const addHeaderButton = tabPane.querySelector(`#add-header-${tabId}`);
+        addHeaderButton.addEventListener("click", (event) => {
+            event.stopPropagation();
+            this.addHeaderRow(tabId, "", "");
+        });
 
-        // Añadir headers por defecto
+        this.tabsContent.appendChild(tabPane);
         this.addHeaderRow(tabId, "Content-Type", "application/json");
-    },
+        return tabPane;
+    }
 
-    // Cierra una pestaña
-    closeTab(tabId, paneId) {
-        if (document.querySelectorAll(".tab-button").length <= 1) {
-            alert("No puedes cerrar la última pestaña.");
-            return;
-        }
-
-        const tabButton = document.getElementById(tabId);
-        if (tabButton) tabButton.remove();
-
+    // Elimina un panel de pestaña
+    removePane(paneId) {
         const tabPane = document.getElementById(paneId);
         if (tabPane) tabPane.remove();
-
-        // Activar la primera pestaña restante
-        const firstTabButton = document.querySelector(".tab-button");
-        if (firstTabButton) {
-            const tabId = firstTabButton.id;
-            const paneId = `pane-${tabId.replace("tab-", "")}`;
-            this.switchTab(tabId, paneId);
-        }
-    },
-
-    // Cambia entre pestañas
-    switchTab(tabId, paneId) {
-        document.querySelectorAll(".tab-button").forEach(tab => {
-            tab.classList.remove("active");
-        });
-        document.querySelectorAll(".tab-pane").forEach(pane => {
-            pane.classList.remove("active");
-        });
-
-        document.getElementById(tabId).classList.add("active");
-        document.getElementById(paneId).classList.add("active");
-    },
+    }
 
     // Añade una fila de header
     addHeaderRow(tabId, key, value) {
         const container = document.getElementById(`headers-container-${tabId}`);
-        const div = document.createElement("div");
-        div.className = "header-row";
-        div.innerHTML = `
+        const row = document.createElement("div");
+        row.className = "header-row";
+
+        row.innerHTML = `
             <div class="cell">
                 <input type="text" class="h-key" placeholder="Key" value="${key || ""}">
             </div>
@@ -118,21 +199,26 @@ const TabManager = {
                 <input type="text" class="h-val" placeholder="Value" value="${value || ""}">
             </div>
             <div class="cell" style="width:35px">
-                <button class="btn btn-del" onclick="event.stopPropagation(); TabManager.removeHeader(this)">x</button>
+                <button class="btn btn-del">x</button>
             </div>
         `;
-        container.appendChild(div);
-        // Aplicar placeholders a los nuevos inputs
-        this.applyPlaceholdersToTab(tabId);
-    },
+
+        // Evento para eliminar la fila de header
+        const deleteButton = row.querySelector(".btn-del");
+        deleteButton.addEventListener("click", (event) => {
+            event.stopPropagation();
+            this.removeHeader(row);
+        });
+
+        container.appendChild(row);
+    }
 
     // Elimina una fila de header
-    removeHeader(btn) {
-        const row = btn.closest(".header-row");
+    removeHeader(row) {
         if (row) row.remove();
-    },
+    }
 
-    // Obtiene la configuración de una pestaña (URL, método, body, headers)
+    // Obtiene la configuración de una pestaña
     getTabConfig(tabId) {
         const getVal = (id) => {
             const el = typeof id === "string" ? document.getElementById(id) : id;
@@ -161,7 +247,7 @@ const TabManager = {
         });
 
         return config;
-    },
+    }
 
     // Carga la configuración en una pestaña
     loadConfigToTab(tabId, data) {
@@ -181,39 +267,5 @@ const TabManager = {
             // Headers por defecto
             this.addHeaderRow(tabId, "Content-Type", "application/json");
         }
-    },
-
-    // Aplica placeholders a los inputs de una pestaña
-    applyPlaceholdersToTab(tabId) {
-        const paneId = `pane-${tabId.replace("tab-", "")}`;
-        const tabPane = document.getElementById(paneId);
-        if (!tabPane) return;
-        const elementos = tabPane.querySelectorAll("[placeholder]");
-        elementos.forEach(el => setupElements(el));
-    },
-};
-
-// Funciones de placeholder (auxiliares)
-function setupElements(el) {
-    const placeholder = el.getAttribute("placeholder");
-    if (placeholder && el.value === "") {
-        el.value = placeholder;
-        el.classList.add("placeholder-style");
     }
-
-    el.addEventListener('focus', function() {
-        if (this.value === this.getAttribute("placeholder")) {
-            this.value = "";
-            this.classList.remove("placeholder-style");
-        }
-    });
-
-    el.addEventListener('blur', function() {
-        if (this.value === "") {
-            this.value = this.getAttribute("placeholder");
-            if (!this.classList.contains("placeholder-style")) {
-                this.classList.add("placeholder-style");
-            }
-        }
-    });
 }

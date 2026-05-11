@@ -10,6 +10,7 @@ body {
     background: #e0e0e0;
     overflow: hidden;
     /*font-size: 0.9em;*/
+    font-size: 13px;
     height: 100vh;
     margin: 0;
 }

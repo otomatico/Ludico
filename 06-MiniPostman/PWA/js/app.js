@@ -2,11 +2,11 @@
 // INICIALIZACIÓN DE LA APLICACIÓN
 // ======================
 
+//Global
+const TabManager = new Tab_Manager();
+
 // Cargar los scripts de los módulos (en orden)
 document.addEventListener("DOMContentLoaded", () => {
-    // Cargar los scripts dinámicamente (opcional, si no usas módulos ES6)
-    // Si usas <script> en HTML, no necesitas esto.
-
     // Asignar eventos del menú
     document.getElementById("fileMenuButton").addEventListener("click", (e) => {
         e.stopPropagation();
@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Añadir la primera pestaña
-    TabManager.addNewTab();
+    TabManager.addNewTab("Petición 1");
 });
 
 // Función para alternar el menú (global)
@@ -50,6 +50,6 @@ document.addEventListener('click', (event) => {
 });
 
 // Exponer objetos globales para el HTML
-window.TabManager = TabManager;
+//window.TabManager = TabManager;
 window.FileManager = FileManager;
 window.RequestManager = RequestManager;
